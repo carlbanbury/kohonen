@@ -145,6 +145,10 @@ class Kohonen {
     );
   }
 
+  weights() {
+    return this.neurons;
+  }
+
   // The U-Matrix value of a particular node
   // is the average distance between the node's weight vector and that of its closest neighbors.
   umatrix() {
