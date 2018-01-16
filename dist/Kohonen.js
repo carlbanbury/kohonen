@@ -159,6 +159,11 @@ var Kohonen = function () {
     value: function mapping() {
       return _fp2.default.map(_fp2.default.flow(this.findBestMatchingUnit.bind(this), _fp2.default.get('pos')), this.data);
     }
+  }, {
+    key: 'weights',
+    value: function weights() {
+      return this.neurons;
+    }
 
     // The U-Matrix value of a particular node
     // is the average distance between the node's weight vector and that of its closest neighbors.
