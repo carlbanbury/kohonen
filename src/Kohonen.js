@@ -176,7 +176,7 @@ class Kohonen {
     if (this.randomStart) {
       var output = [];
       for (var i=0; i<this.numNeurons; i++) {
-        var tempVector = Array(this.data.length).fill(0).map(()=>Math.random());
+        var tempVector = Array(this.data[0].length).fill(0).map(()=>Math.random());
         output.push(tempVector);
       }
 
