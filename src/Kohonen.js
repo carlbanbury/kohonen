@@ -43,6 +43,7 @@ class Kohonen {
     maxLearningCoef = .4,
     minNeighborhood = .3,
     maxNeighborhood = 1,
+    randomStart = false
   }) {
 
     // data vectors should have at least one dimension
@@ -70,6 +71,7 @@ class Kohonen {
     this.numNeurons = neurons.length;
     this.step = 0;
     this.maxStep = maxStep;
+    this.randomStart = randomStart;
 
     // generate scaleStepLearningCoef,
     // as the learning coef decreases with time
@@ -169,6 +171,18 @@ class Kohonen {
   }
 
   generateInitialVectors() {
+
+    // use random initialisation instead of PCA
+    if (this.randomStart) {
+      output = [];
+      for (var i=0; i<this.numNeurons; i++) {
+        tempVector = Array(this.data.length).fill(0).map(()=>Math.random());
+        output.push(tempVector);
+      }
+
+      return output;
+    }
+
     // principal component analysis
     // standardize to false as we already standardize ours
     //
