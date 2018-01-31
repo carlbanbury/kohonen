@@ -70,7 +70,9 @@ var Kohonen = function () {
         _ref$minNeighborhood = _ref.minNeighborhood,
         minNeighborhood = _ref$minNeighborhood === undefined ? .3 : _ref$minNeighborhood,
         _ref$maxNeighborhood = _ref.maxNeighborhood,
-        maxNeighborhood = _ref$maxNeighborhood === undefined ? 1 : _ref$maxNeighborhood;
+        maxNeighborhood = _ref$maxNeighborhood === undefined ? 1 : _ref$maxNeighborhood,
+        _ref$randomStart = _ref.randomStart,
+        randomStart = _ref$randomStart === undefined ? false : _ref$randomStart;
 
     _classCallCheck(this, Kohonen);
 
@@ -97,6 +99,7 @@ var Kohonen = function () {
     this.numNeurons = neurons.length;
     this.step = 0;
     this.maxStep = maxStep;
+    this.randomStart = randomStart;
 
     // generate scaleStepLearningCoef,
     // as the learning coef decreases with time
@@ -199,6 +202,19 @@ var Kohonen = function () {
     key: 'generateInitialVectors',
     value: function generateInitialVectors() {
       var _this2 = this;
+
+      // use random initialisation instead of PCA
+      if (this.randomStart) {
+        output = [];
+        for (var i = 0; i < this.numNeurons; i++) {
+          tempVector = Array(this.data.length).fill(0).map(function () {
+            return Math.random();
+          });
+          output.push(tempVector);
+        }
+
+        return output;
+      }
 
       // principal component analysis
       // standardize to false as we already standardize ours
