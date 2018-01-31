@@ -205,9 +205,9 @@ var Kohonen = function () {
 
       // use random initialisation instead of PCA
       if (this.randomStart) {
-        output = [];
+        var output = [];
         for (var i = 0; i < this.numNeurons; i++) {
-          tempVector = Array(this.data.length).fill(0).map(function () {
+          var tempVector = Array(this.data.length).fill(0).map(function () {
             return Math.random();
           });
           output.push(tempVector);
