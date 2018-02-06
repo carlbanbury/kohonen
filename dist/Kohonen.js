@@ -59,6 +59,8 @@ var Kohonen = function () {
   // You also should normalized your neighborhood in such a way that 2 neighbors
   // got an euclidian distance of 1 between each other.
   function Kohonen(_ref) {
+    var _this = this;
+
     var neurons = _ref.neurons,
         data = _ref.data,
         _ref$maxStep = _ref.maxStep,
@@ -72,7 +74,9 @@ var Kohonen = function () {
         _ref$maxNeighborhood = _ref.maxNeighborhood,
         maxNeighborhood = _ref$maxNeighborhood === undefined ? 1 : _ref$maxNeighborhood,
         _ref$randomStart = _ref.randomStart,
-        randomStart = _ref$randomStart === undefined ? false : _ref$randomStart;
+        randomStart = _ref$randomStart === undefined ? false : _ref$randomStart,
+        _ref$classPlanes = _ref.classPlanes,
+        classPlanes = _ref$classPlanes === undefined ? undefined : _ref$classPlanes;
 
     _classCallCheck(this, Kohonen);
 
@@ -93,6 +97,19 @@ var Kohonen = function () {
       if (!allNum) {
         throw new Error('Kohonen constructor: all vectors should number values');
       }
+    }
+
+    // build structures for data including class planes and data without class planes
+    if (this.classPlanes) {
+      this._data = this.data;
+      this.classData = this.data.map(function (item) {
+        return item.splice(-_this.classPlanes.length);
+      });
+      this.data = this.data.map(function (item) {
+        return item.splice(0, item.length - _this.classPlanes.length);
+      });
+      console.log(this.classData[0].length);
+      consol.log(this.data[0].length);
     }
 
     this.size = data[0].length;
@@ -174,7 +191,7 @@ var Kohonen = function () {
   }, {
     key: 'umatrix',
     value: function umatrix() {
-      var _this = this;
+      var _this2 = this;
 
       var roundToTwo = function roundToTwo(num) {
         return +(Math.round(num + "e+2") + "e-2");
@@ -182,7 +199,7 @@ var Kohonen = function () {
       var findNeighors = function findNeighors(cn) {
         return _fp2.default.filter(function (n) {
           return roundToTwo((0, _vector.dist)(n.pos, cn.pos)) === 1;
-        }, _this.neurons);
+        }, _this2.neurons);
       };
       return _fp2.default.map(function (n) {
         return (0, _d3Array.mean)(findNeighors(n).map(function (nb) {
@@ -201,7 +218,7 @@ var Kohonen = function () {
   }, {
     key: 'generateInitialVectors',
     value: function generateInitialVectors() {
-      var _this2 = this;
+      var _this3 = this;
 
       // use random initialisation instead of PCA
       if (this.randomStart) {
@@ -234,13 +251,13 @@ var Kohonen = function () {
 
       // we generate all random vectors and uncentered them by adding means vector
       return _fp2.default.map(function () {
-        return (0, _vector.add)(generateRandomVecWithinEigenvectorsSpace(), _this2.means);
+        return (0, _vector.add)(generateRandomVecWithinEigenvectorsSpace(), _this3.means);
       }, _fp2.default.range(0, this.numNeurons));
     }
   }, {
     key: 'learn',
     value: function learn(v) {
-      var _this3 = this;
+      var _this4 = this;
 
       // find bmu
       var bmu = this.findBestMatchingUnit(v);
@@ -249,7 +266,7 @@ var Kohonen = function () {
 
       this.neurons.forEach(function (n) {
         // compute neighborhood
-        var currentNeighborhood = _this3.neighborhood({ bmu: bmu, n: n });
+        var currentNeighborhood = _this4.neighborhood({ bmu: bmu, n: n });
 
         // compute delta for the current neuron
         var delta = (0, _vector.mult)((0, _vector.diff)(n.v, v), currentNeighborhood * currentLearningCoef);
