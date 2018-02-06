@@ -43,7 +43,8 @@ class Kohonen {
     maxLearningCoef = .4,
     minNeighborhood = .3,
     maxNeighborhood = 1,
-    randomStart = false
+    randomStart = false,
+    classPlanes = undefined
   }) {
 
     // data vectors should have at least one dimension
@@ -65,6 +66,15 @@ class Kohonen {
       if(!allNum) {
         throw new Error('Kohonen constructor: all vectors should number values');
       }
+    }
+
+    // build structures for data including class planes and data without class planes
+    if (this.classPlanes) {
+      this._data = this.data;
+      this.classData = this.data.map((item)=>{return item.splice(-this.classPlanes.length)});
+      this.data = this.data.map((item)=>{return item.splice(0,item.length-this.classPlanes.length)});
+      console.log(this.classData[0].length);
+      consol.log(this.data[0].length);
     }
 
     this.size = data[0].length;
