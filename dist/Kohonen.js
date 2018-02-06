@@ -99,20 +99,6 @@ var Kohonen = function () {
       }
     }
 
-    // build structures for data including class planes and data without class planes
-    this.classPlanes = classPlanes;
-    if (this.classPlanes) {
-      this._data = this.data;
-      this.classData = this.data.map(function (item) {
-        return item.splice(-_this.classPlanes.length);
-      });
-      this.data = this.data.map(function (item) {
-        return item.splice(0, item.length - _this.classPlanes.length);
-      });
-      console.log(this.classData[0].length);
-      console.log(this.data[0].length);
-    }
-
     this.size = data[0].length;
     this.numNeurons = neurons.length;
     this.step = 0;
@@ -134,8 +120,22 @@ var Kohonen = function () {
       return (0, _d3Scale.scaleLinear)().domain(extent).range([0, 1]);
     });
 
+    // build structures for data including class planes and data without class planes
+    this.classPlanes = classPlanes;
+    this._data = data;
+    if (this.classPlanes) {
+      this.classData = this._data.map(function (item) {
+        return item.splice(-_this.classPlanes.length);
+      });
+      this._data = this._data.map(function (item) {
+        return item.splice(0, item.length - _this.classPlanes.length);
+      });
+      console.log(this.classData[0].length);
+      console.log(this._data[0].length);
+    }
+
     // build normalized data
-    this.data = this.normalize(data, scales);
+    this.data = this.normalize(this._data, scales);
 
     // then we store means and deviations for normalized datas
     this.means = _fp2.default.flow(_fp2.default.unzip, _fp2.default.map(_d3Array.mean))(this.data);
