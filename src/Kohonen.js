@@ -69,12 +69,13 @@ class Kohonen {
     }
 
     // build structures for data including class planes and data without class planes
+    this.classPlanes = classPlanes;
     if (this.classPlanes) {
       this._data = this.data;
       this.classData = this.data.map((item)=>{return item.splice(-this.classPlanes.length)});
       this.data = this.data.map((item)=>{return item.splice(0,item.length-this.classPlanes.length)});
       console.log(this.classData[0].length);
-      consol.log(this.data[0].length);
+      console.log(this.data[0].length);
     }
 
     this.size = data[0].length;

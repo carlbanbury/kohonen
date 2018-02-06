@@ -100,6 +100,7 @@ var Kohonen = function () {
     }
 
     // build structures for data including class planes and data without class planes
+    this.classPlanes = classPlanes;
     if (this.classPlanes) {
       this._data = this.data;
       this.classData = this.data.map(function (item) {
@@ -109,7 +110,7 @@ var Kohonen = function () {
         return item.splice(0, item.length - _this.classPlanes.length);
       });
       console.log(this.classData[0].length);
-      consol.log(this.data[0].length);
+      console.log(this.data[0].length);
     }
 
     this.size = data[0].length;
