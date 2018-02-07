@@ -125,10 +125,10 @@ var Kohonen = function () {
     this._data = data;
     if (this.classPlanes) {
       this.classData = this._data.map(function (item) {
-        return item.splice(-_this.classPlanes.length);
+        return item.slice(-_this.classPlanes.length);
       });
       this._data = this._data.map(function (item) {
-        return item.splice(0, item.length - _this.classPlanes.length);
+        return item.slice(0, item.length - _this.classPlanes.length);
       });
       console.log(this.classData[0].length);
       console.log(this._data[0].length);

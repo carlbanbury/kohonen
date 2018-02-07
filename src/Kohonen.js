@@ -102,8 +102,8 @@ class Kohonen {
     this.classPlanes = classPlanes;
     this._data = data;
     if (this.classPlanes) {
-      this.classData = this._data.map((item)=>{return item.splice(-this.classPlanes.length)});
-      this._data = this._data.map((item)=>{return item.splice(0,item.length-this.classPlanes.length)});
+      this.classData = this._data.map((item)=>{return item.slice(-this.classPlanes.length)});
+      this._data = this._data.map((item)=>{return item.slice(0,item.length-this.classPlanes.length)});
       console.log(this.classData[0].length);
       console.log(this._data[0].length);
     }
