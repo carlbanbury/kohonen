@@ -120,9 +120,10 @@ var Kohonen = function () {
       return (0, _d3Scale.scaleLinear)().domain(extent).range([0, 1]);
     });
 
-    // build structures for data including class planes and data without class planes
     this.classPlanes = classPlanes;
     this._data = data;
+
+    // build structures for data including class planes and data without class planes
     if (this.classPlanes) {
       this.classData = this._data.map(function (item) {
         return item.slice(-_this.classPlanes.length);
@@ -130,8 +131,6 @@ var Kohonen = function () {
       this._data = this._data.map(function (item) {
         return item.slice(0, item.length - _this.classPlanes.length);
       });
-      console.log(this.classData[0].length);
-      console.log(this._data[0].length);
     }
 
     // build normalized data
@@ -141,6 +140,15 @@ var Kohonen = function () {
     this.means = _fp2.default.flow(_fp2.default.unzip, _fp2.default.map(_d3Array.mean))(this.data);
 
     this.deviations = _fp2.default.flow(_fp2.default.unzip, _fp2.default.map(_d3Array.deviation))(this.data);
+
+    // Append class information back to data now data has been normalized
+    if (this.classPlanes) {
+      for (var i = 0; i < this.data.length; i++) {
+        this.data[i] = this.data[i].concat(this.classPlanes[i]);
+      }
+    }
+
+    console.log(this.data.length);
 
     // On each neuron, generate a random vector v
     // of <size> dimension
