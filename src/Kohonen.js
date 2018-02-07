@@ -250,11 +250,12 @@ class Kohonen {
   // Find closer neuron
   findBestMatchingUnit(v) {
     var target = v;
-    var _neurons = this.neurons;
+    var _neurons = _.cloneDeep(this.neurons);
 
     if (this.classPlanes) {
       // do not include class plane data in finding best matching unit.
       target = target.slice(0, target.length-this.classPlanes.length);
+
       _neurons.map((item) => {
         item.v = item.v.slice(0, item.v.length-this.classPlanes.length);
       });
