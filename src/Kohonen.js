@@ -254,9 +254,9 @@ class Kohonen {
 
     if (this.classPlanes) {
       // do not include class plane data in finding best matching unit.
-      target = target.slice(0,target.length-this.classPlanes.length);
-      _neurons = _neurons.map(item =>{
-        return item.slice(0,item.length-this.classPlanes.length);
+      target = target.slice(0, target.length-this.classPlanes.length);
+      _neurons.map((item) => {
+        item.v = item.v.slice(0, item.v.length-this.classPlanes.length);
       });
     }
 

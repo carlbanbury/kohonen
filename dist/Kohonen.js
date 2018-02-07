@@ -298,8 +298,8 @@ var Kohonen = function () {
       if (this.classPlanes) {
         // do not include class plane data in finding best matching unit.
         target = target.slice(0, target.length - this.classPlanes.length);
-        _neurons = _neurons.map(function (item) {
-          return item.slice(0, item.length - _this5.classPlanes.length);
+        _neurons.map(function (item) {
+          item.v = item.v.slice(0, item.v.length - _this5.classPlanes.length);
         });
       }
 
