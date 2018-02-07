@@ -98,14 +98,13 @@ class Kohonen {
       .domain(extent)
       .range([0, 1]));
 
-    // build structures for data including class planes and data without class planes
     this.classPlanes = classPlanes;
     this._data = data;
+
+    // build structures for data including class planes and data without class planes
     if (this.classPlanes) {
       this.classData = this._data.map((item)=>{return item.slice(-this.classPlanes.length)});
       this._data = this._data.map((item)=>{return item.slice(0,item.length-this.classPlanes.length)});
-      console.log(this.classData[0].length);
-      console.log(this._data[0].length);
     }
 
     // build normalized data
@@ -121,6 +120,15 @@ class Kohonen {
       _.unzip,
       _.map(deviation)
     )(this.data);
+
+    // Append class information back to data now data has been normalized
+    if (this.classPlanes) {
+      for (var i=0; i<this.data.length; i++) {
+        this.data[i] = this.data[i].concat(this.classPlanes[i]);
+      }
+    }
+
+    console.log(this.data.length);
 
     // On each neuron, generate a random vector v
     // of <size> dimension
