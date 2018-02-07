@@ -144,11 +144,9 @@ var Kohonen = function () {
     // Append class information back to data now data has been normalized
     if (this.classPlanes) {
       for (var i = 0; i < this.data.length; i++) {
-        this.data[i] = this.data[i].concat(this.classPlanes[i]);
+        this.data[i] = this.data[i].concat(this.classData[i]);
       }
     }
-
-    console.log(this.data.length);
 
     // On each neuron, generate a random vector v
     // of <size> dimension
@@ -269,6 +267,7 @@ var Kohonen = function () {
       var _this4 = this;
 
       // find bmu
+      // TODO: Remove classPlane data from finding best matching unit
       var bmu = this.findBestMatchingUnit(v);
       // compute current learning coef
       var currentLearningCoef = this.scaleStepLearningCoef(this.step);
@@ -291,9 +290,21 @@ var Kohonen = function () {
   }, {
     key: 'findBestMatchingUnit',
     value: function findBestMatchingUnit(v) {
+      var target = v;
+      var _neurons = this.neurons;
+
+      // if (this.classPlanes) {
+      //   // do not include class plane data in finding best matching unit.
+      //   target = target.slice(0,target.length-this.classPlanes.length);
+      //   _neurons = _neurons.map(item =>{
+      //     return item.slice(0,item.length-this.classPlanes.length);
+      //   });
+      // }
+
+      // TODO: Need to append class data before return
       return _fp2.default.flow(_fp2.default.orderBy(function (n) {
-        return (0, _vector.dist)(v, n.v);
-      }, 'asc'), _fp2.default.first)(this.neurons);
+        return (0, _vector.dist)(target, n.v);
+      }, 'asc'), _fp2.default.first)(_neurons);
     }
 
     // http://en.wikipedia.org/wiki/Gaussian_function#Two-dimensional_Gaussian_function

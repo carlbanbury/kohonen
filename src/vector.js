@@ -7,6 +7,8 @@ export const dist = (v1, v2) => {
   if(isNaN(d) || !isFinite(d)){
     throw new Error('vector.dist : not a number');
   }
+  console.log('bmu output');
+  console.log(d);
   return d;
 };
 
@@ -25,4 +27,3 @@ export const add = (v1, v2) => v1.map((val, i) => v2[i] + val);
 // https://github.com/mbostock/d3/wiki/Math
 export const random = (size, mean = 0.0, deviation = 1.0) =>
   _.map(i => randomNormal(mean, deviation)(), _.range(0, size));
-
