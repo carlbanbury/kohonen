@@ -7,8 +7,6 @@ export const dist = (v1, v2) => {
   if(isNaN(d) || !isFinite(d)){
     throw new Error('vector.dist : not a number');
   }
-  console.log('bmu output');
-  console.log(d);
   return d;
 };
 

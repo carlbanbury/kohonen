@@ -290,18 +290,19 @@ var Kohonen = function () {
   }, {
     key: 'findBestMatchingUnit',
     value: function findBestMatchingUnit(v) {
+      var _this5 = this;
+
       var target = v;
       var _neurons = this.neurons;
 
-      // if (this.classPlanes) {
-      //   // do not include class plane data in finding best matching unit.
-      //   target = target.slice(0,target.length-this.classPlanes.length);
-      //   _neurons = _neurons.map(item =>{
-      //     return item.slice(0,item.length-this.classPlanes.length);
-      //   });
-      // }
+      if (this.classPlanes) {
+        // do not include class plane data in finding best matching unit.
+        target = target.slice(0, target.length - this.classPlanes.length);
+        _neurons = _neurons.map(function (item) {
+          return item.slice(0, item.length - _this5.classPlanes.length);
+        });
+      }
 
-      // TODO: Need to append class data before return
       return _fp2.default.flow(_fp2.default.orderBy(function (n) {
         return (0, _vector.dist)(target, n.v);
       }, 'asc'), _fp2.default.first)(_neurons);
