@@ -22,6 +22,10 @@ var _mlPca2 = _interopRequireDefault(_mlPca);
 
 var _vector = require('./vector');
 
+var _norm = require('norm');
+
+var _norm2 = _interopRequireDefault(_norm);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -146,11 +150,10 @@ var Kohonen = function () {
   _createClass(Kohonen, [{
     key: 'normalize',
     value: function normalize(data, scales) {
-      return data.map(function (v) {
-        return v.map(function (s, i) {
-          return scales[i](s);
-        });
+      data.forEach(function (item, index) {
+        data[index] = _norm2.default.normalize(data[index]);
       });
+      return data;
     }
 
     // learn and return corresponding neurons for the dataset

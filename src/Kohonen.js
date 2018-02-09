@@ -3,6 +3,7 @@ import { extent, mean, deviation } from 'd3-array';
 import _ from 'lodash/fp';
 import PCA from 'ml-pca';
 import { dist, mult, diff, add } from './vector';
+import n from 'norm';
 
 // lodash/fp random has a fixed arity of 2, without the last (and useful) param
 const random = _.random.convert({ fixed: false });
@@ -129,7 +130,10 @@ class Kohonen {
   }
 
   normalize(data, scales) {
-    return data.map(v => v.map((s, i) => scales[i](s)));
+    data.forEach(function(item, index) {
+      data[index] = n.normalize(data[index]);
+    });
+    return data;
   }
 
   // learn and return corresponding neurons for the dataset
