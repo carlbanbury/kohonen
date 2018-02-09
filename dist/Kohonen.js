@@ -22,7 +22,7 @@ var _mlPca2 = _interopRequireDefault(_mlPca);
 
 var _vector = require('./vector');
 
-var _norm = require('norm');
+var _norm = require('norm.js');
 
 var _norm2 = _interopRequireDefault(_norm);
 
@@ -115,22 +115,9 @@ var Kohonen = function () {
     this.scaleStepNeighborhood = (0, _d3Scale.scaleLinear)().clamp(true).domain([0, maxStep]).range([maxNeighborhood, minNeighborhood]);
 
     this.classPlanes = classPlanes;
-    this.data = data;
 
-    // TODO: Reintroduce option for normalization.
-    // // retrive min and max for each feature
-    // const unnormalizedExtents = _.flow(
-    //   _.unzip,
-    //   _.map(extent)
-    // )(this._data);
-    //
-    // // build scales for data normalization
-    // const scales = unnormalizedExtents.map(extent => scaleLinear()
-    //   .domain(extent)
-    //   .range([0, 1]));
-    //
     // // build normalized data
-    // this.data = this.normalize(this._data, scales);
+    this.data = this.normalize(data);
 
     // then we store means and deviations for normalized datas
     this.means = _fp2.default.flow(_fp2.default.unzip, _fp2.default.map(_d3Array.mean))(this.data);
@@ -149,9 +136,9 @@ var Kohonen = function () {
 
   _createClass(Kohonen, [{
     key: 'normalize',
-    value: function normalize(data, scales) {
+    value: function normalize(data) {
       data.forEach(function (item, index) {
-        data[index] = _norm2.default.normalize(data[index]);
+        data[index] = _norm2.default.normalize(item);
       });
       return data;
     }

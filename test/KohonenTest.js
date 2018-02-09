@@ -128,6 +128,7 @@ describe('Kohonen 1', ()=> {
     it('should produced normalized data between 0 and 1', () => {
       for(let d of [data, otherData]){
         const k = new Kohonen({ data: d, neurons: generateGrid(10, 10) });
+        // console.log(k.data);
         k.data.forEach(d => {
           d.forEach(s => {
             assert.isTrue(s >= 0);
@@ -136,7 +137,6 @@ describe('Kohonen 1', ()=> {
         });
       }
     });
-
   });
 
   describe('findBestMatchingUnit', ()=> {
@@ -287,5 +287,3 @@ describe('Kohonen 1', ()=> {
   });
 
 });
-
-

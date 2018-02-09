@@ -3,7 +3,7 @@ import { extent, mean, deviation } from 'd3-array';
 import _ from 'lodash/fp';
 import PCA from 'ml-pca';
 import { dist, mult, diff, add } from './vector';
-import n from 'norm';
+import n from 'norm.js';
 
 // lodash/fp random has a fixed arity of 2, without the last (and useful) param
 const random = _.random.convert({ fixed: false });
@@ -89,22 +89,9 @@ class Kohonen {
       .range([maxNeighborhood, minNeighborhood]);
 
     this.classPlanes = classPlanes;
-    this.data = data;
 
-    // TODO: Reintroduce option for normalization.
-    // // retrive min and max for each feature
-    // const unnormalizedExtents = _.flow(
-    //   _.unzip,
-    //   _.map(extent)
-    // )(this._data);
-    //
-    // // build scales for data normalization
-    // const scales = unnormalizedExtents.map(extent => scaleLinear()
-    //   .domain(extent)
-    //   .range([0, 1]));
-    //
     // // build normalized data
-    // this.data = this.normalize(this._data, scales);
+    this.data = this.normalize(data);
 
     // then we store means and deviations for normalized datas
     this.means = _.flow(
@@ -129,9 +116,9 @@ class Kohonen {
     );
   }
 
-  normalize(data, scales) {
+  normalize(data) {
     data.forEach(function(item, index) {
-      data[index] = n.normalize(data[index]);
+      data[index] = n.normalize(item);
     });
     return data;
   }
