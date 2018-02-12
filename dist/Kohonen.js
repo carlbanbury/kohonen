@@ -138,7 +138,7 @@ var Kohonen = function () {
     key: 'normalize',
     value: function normalize(data) {
       data.forEach(function (item, index) {
-        data[index] = _norm2.default.normalize(item);
+        data[index] = _norm2.default.normalize(item, 'max');
       });
       return data;
     }

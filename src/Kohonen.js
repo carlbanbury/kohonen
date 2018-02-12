@@ -118,7 +118,7 @@ class Kohonen {
 
   normalize(data) {
     data.forEach(function(item, index) {
-      data[index] = n.normalize(item);
+      data[index] = n.normalize(item, 'max');
     });
     return data;
   }
