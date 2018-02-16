@@ -89,9 +89,23 @@ class Kohonen {
       .range([maxNeighborhood, minNeighborhood]);
 
     this.classPlanes = classPlanes;
+    this._data = data;
 
-    // // build normalized data
-    this.data = this.normalize(data);
+    // build structures for data including class planes and data without class planes
+    if (this.classPlanes) {
+      this.classData = this._data.map((item)=>{return item.slice(-this.classPlanes.length)});
+      this._data = this._data.map((item)=>{return item.slice(0,item.length-this.classPlanes.length)});
+    }
+
+    // build normalized data
+    this.data = this.normalize(this._data);
+
+    // Append class information back to data now data has been normalized
+    if (this.classPlanes) {
+      for (var i=0; i<this.data.length; i++) {
+        this.data[i] = this.data[i].concat(this.classData[i]);
+      }
+    }
 
     // then we store means and deviations for normalized datas
     this.means = _.flow(

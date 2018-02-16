@@ -63,6 +63,8 @@ var Kohonen = function () {
   // You also should normalized your neighborhood in such a way that 2 neighbors
   // got an euclidian distance of 1 between each other.
   function Kohonen(_ref) {
+    var _this = this;
+
     var neurons = _ref.neurons,
         data = _ref.data,
         _ref$maxStep = _ref.maxStep,
@@ -115,9 +117,27 @@ var Kohonen = function () {
     this.scaleStepNeighborhood = (0, _d3Scale.scaleLinear)().clamp(true).domain([0, maxStep]).range([maxNeighborhood, minNeighborhood]);
 
     this.classPlanes = classPlanes;
+    this._data = data;
 
-    // // build normalized data
-    this.data = this.normalize(data);
+    // build structures for data including class planes and data without class planes
+    if (this.classPlanes) {
+      this.classData = this._data.map(function (item) {
+        return item.slice(-_this.classPlanes.length);
+      });
+      this._data = this._data.map(function (item) {
+        return item.slice(0, item.length - _this.classPlanes.length);
+      });
+    }
+
+    // build normalized data
+    this.data = this.normalize(this._data);
+
+    // Append class information back to data now data has been normalized
+    if (this.classPlanes) {
+      for (var i = 0; i < this.data.length; i++) {
+        this.data[i] = this.data[i].concat(this.classData[i]);
+      }
+    }
 
     // then we store means and deviations for normalized datas
     this.means = _fp2.default.flow(_fp2.default.unzip, _fp2.default.map(_d3Array.mean))(this.data);
@@ -173,7 +193,7 @@ var Kohonen = function () {
   }, {
     key: 'umatrix',
     value: function umatrix() {
-      var _this = this;
+      var _this2 = this;
 
       var roundToTwo = function roundToTwo(num) {
         return +(Math.round(num + "e+2") + "e-2");
@@ -181,7 +201,7 @@ var Kohonen = function () {
       var findNeighors = function findNeighors(cn) {
         return _fp2.default.filter(function (n) {
           return roundToTwo((0, _vector.dist)(n.pos, cn.pos)) === 1;
-        }, _this.neurons);
+        }, _this2.neurons);
       };
       return _fp2.default.map(function (n) {
         return (0, _d3Array.mean)(findNeighors(n).map(function (nb) {
@@ -200,7 +220,7 @@ var Kohonen = function () {
   }, {
     key: 'generateInitialVectors',
     value: function generateInitialVectors() {
-      var _this2 = this;
+      var _this3 = this;
 
       // use random initialisation instead of PCA
       if (this.randomStart) {
@@ -233,13 +253,13 @@ var Kohonen = function () {
 
       // we generate all random vectors and uncentered them by adding means vector
       return _fp2.default.map(function () {
-        return (0, _vector.add)(generateRandomVecWithinEigenvectorsSpace(), _this2.means);
+        return (0, _vector.add)(generateRandomVecWithinEigenvectorsSpace(), _this3.means);
       }, _fp2.default.range(0, this.numNeurons));
     }
   }, {
     key: 'learn',
     value: function learn(v) {
-      var _this3 = this;
+      var _this4 = this;
 
       // find bmu
       // TODO: Remove classPlane data from finding best matching unit
@@ -249,7 +269,7 @@ var Kohonen = function () {
 
       this.neurons.forEach(function (n) {
         // compute neighborhood
-        var currentNeighborhood = _this3.neighborhood({ bmu: bmu, n: n });
+        var currentNeighborhood = _this4.neighborhood({ bmu: bmu, n: n });
 
         // compute delta for the current neuron
         var delta = (0, _vector.mult)((0, _vector.diff)(n.v, v), currentNeighborhood * currentLearningCoef);
@@ -265,7 +285,7 @@ var Kohonen = function () {
   }, {
     key: 'findBestMatchingUnit',
     value: function findBestMatchingUnit(v) {
-      var _this4 = this;
+      var _this5 = this;
 
       var target = v;
       var _neurons = _fp2.default.cloneDeep(this.neurons);
@@ -275,7 +295,7 @@ var Kohonen = function () {
         target = target.slice(0, target.length - this.classPlanes.length);
 
         _neurons.map(function (item) {
-          item.v = item.v.slice(0, item.v.length - _this4.classPlanes.length);
+          item.v = item.v.slice(0, item.v.length - _this5.classPlanes.length);
         });
       }
 
