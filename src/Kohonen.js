@@ -158,6 +158,7 @@ class Kohonen {
   }
 
   classify(test, threshold) {
+    test = n.normalize(test, 'max');
     if (!this.classPlanes) {
       return null;
     }

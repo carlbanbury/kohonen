@@ -184,6 +184,7 @@ var Kohonen = function () {
   }, {
     key: 'classify',
     value: function classify(test, threshold) {
+      test = _norm2.default.normalize(test, 'max');
       if (!this.classPlanes) {
         return null;
       }
