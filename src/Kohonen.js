@@ -179,7 +179,7 @@ class Kohonen {
       }
     }
 
-    return {className: this.classPlanes[index], index: index};
+    return {className: this.classPlanes[index], index: index, weight: temp};
   }
 
   weights() {

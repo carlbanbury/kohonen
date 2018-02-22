@@ -205,7 +205,7 @@ var Kohonen = function () {
         }
       }
 
-      return { className: this.classPlanes[index], index: index };
+      return { className: this.classPlanes[index], index: index, weight: temp };
     }
   }, {
     key: 'weights',
