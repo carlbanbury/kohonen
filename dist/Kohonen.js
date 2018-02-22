@@ -182,6 +182,31 @@ var Kohonen = function () {
       return _fp2.default.map(_fp2.default.flow(this.findBestMatchingUnit.bind(this), _fp2.default.get('pos')), this.data);
     }
   }, {
+    key: 'classify',
+    value: function classify(test, threshold) {
+      if (!this.classPlanes) {
+        return null;
+      }
+
+      if (!threshold) {
+        threshold = 0;
+      }
+
+      var bmu = this.findBestMatchingUnit(test);
+
+      var classes = bmu.v.slice(bmu.v.length - this.classPlanes.length, bmu.v.length);
+      var index = undefined;
+      var temp = null;
+      for (var i = 0; i < classes.length; i++) {
+        if (classes[i] > temp && classes[i] > threshold) {
+          temp = classes[i];
+          index = i;
+        }
+      }
+
+      return { className: this.classPlanes[index], index: index };
+    }
+  }, {
     key: 'weights',
     value: function weights() {
       return this.neurons;

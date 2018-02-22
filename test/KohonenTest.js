@@ -250,6 +250,66 @@ describe('Kohonen 1', ()=> {
 
   });
 
+  describe('classify', () => {
+    it('should return null if no class planes are defined', () => {
+      const k = new Kohonen({
+        data,
+        neurons: generateGrid(6, 6),
+        maxStep: 100
+      });
+
+      const test = k.classify();
+      assert.equal(test, null);
+    });
+
+    it('should return class name and index', () => {
+      var data = [
+        [0, 0, 0, 1, 0],
+        [0, 0, 0, 1, 0],
+        [0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 1],
+      ]
+      const k = new Kohonen({ data: data, neurons: generateGrid(5, 5), classPlanes: ['a', 'b']});
+      const test = k.classify([0, 0, 0]);
+      assert.isString(test.className);
+      assert.isNumber(test.index);
+    });
+
+    it('should return undefined class name and index if unable to classify', () => {
+      var data = [
+        [0, 0, 0, 1, 0],
+        [0, 0, 0, 1, 0],
+        [0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 1],
+      ]
+      const k = new Kohonen({ data: data, neurons: generateGrid(3, 3), classPlanes: ['a', 'b'], randomStart: true});
+      k.training();
+      const test = k.classify([0, 0, 0], 0.5);
+      assert.equal(test.className, undefined);
+      assert.equal(test.index, null);
+    });
+
+    it('should correctly classify data', () => {
+      var data = [
+        [0, 0, 255, 1, 0],
+        [0, 0, 255, 1, 0],
+        [0, 0, 255, 1, 0],
+        [0, 0, 255, 1, 0],
+        [0, 0, 255, 1, 0],
+        [255, 0, 0, 0, 1],
+        [255, 0, 0, 0, 1],
+        [255, 0, 0, 0, 1],
+        [255, 0, 0, 0, 1],
+        [255, 0, 0, 0, 1]
+      ]
+      const k = new Kohonen({ data: data, neurons: generateGrid(3, 3), classPlanes: ['a', 'b'], randomStart: true});
+      k.training();
+      const test = k.classify([255, 0, 0]);
+      assert.equal(test.className, 'b');
+      assert.equal(test.index, 1);
+    });
+  });
+
   describe('mapping', () => {
 
     it('should return the data as an array of pos', () => {

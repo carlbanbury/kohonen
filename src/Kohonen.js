@@ -157,6 +157,30 @@ class Kohonen {
     );
   }
 
+  classify(test, threshold) {
+    if (!this.classPlanes) {
+      return null;
+    }
+
+    if (!threshold) {
+      threshold = 0;
+    }
+
+    var bmu = this.findBestMatchingUnit(test);
+
+    var classes = bmu.v.slice(bmu.v.length-this.classPlanes.length, bmu.v.length);
+    var index = undefined;
+    var temp = null;
+    for (var i=0; i<classes.length; i++) {
+      if (classes[i] > temp && classes[i] > threshold) {
+        temp = classes[i];
+        index = i;
+      }
+    }
+
+    return {className: this.classPlanes[index], index: index};
+  }
+
   weights() {
     return this.neurons;
   }
