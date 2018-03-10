@@ -284,9 +284,13 @@ class Kohonen {
       });
     }
 
-    var bmuTruncated = _fp2.default.flow(_fp2.default.orderBy(function (n) {
-      return (0, _vector.dist)(target, n.v);
-    }, 'asc'), _fp2.default.first)(_neurons);
+    var bmuTruncated = _.flow(
+      _.orderBy(
+        n => dist(target, n.v),
+        'asc',
+      ),
+      _.first
+    )(_neurons)
 
     if (!this.classPlanes) {
       return bmuTruncated;
