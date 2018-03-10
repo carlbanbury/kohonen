@@ -158,16 +158,21 @@ class Kohonen {
   }
 
   classify(test, threshold) {
-    test = n.normalize(test, 'max');
     if (!this.classPlanes) {
       return null;
     }
+
+    var classData = test.slice(-this.classPlanes.length);
+    var testData = test.slice(0,test.length-this.classPlanes.length);
+    testData = n.normalize(testData, 'max');
+    testData = testData.concat(classData);
+
 
     if (!threshold) {
       threshold = 0;
     }
 
-    var bmu = this.findBestMatchingUnit(test);
+    var bmu = this.findBestMatchingUnit(testData);
 
     var classes = bmu.v.slice(bmu.v.length-this.classPlanes.length, bmu.v.length);
     var index = undefined;

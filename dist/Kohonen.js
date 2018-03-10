@@ -184,16 +184,20 @@ var Kohonen = function () {
   }, {
     key: 'classify',
     value: function classify(test, threshold) {
-      test = _norm2.default.normalize(test, 'max');
       if (!this.classPlanes) {
         return null;
       }
+
+      var classData = test.slice(-this.classPlanes.length);
+      var testData = test.slice(0, test.length - this.classPlanes.length);
+      testData = _norm2.default.normalize(testData, 'max');
+      testData = testData.concat(classData);
 
       if (!threshold) {
         threshold = 0;
       }
 
-      var bmu = this.findBestMatchingUnit(test);
+      var bmu = this.findBestMatchingUnit(testData);
 
       var classes = bmu.v.slice(bmu.v.length - this.classPlanes.length, bmu.v.length);
       var index = undefined;
