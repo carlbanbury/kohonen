@@ -14,13 +14,13 @@ var _d3Array = require('d3-array');
 
 var _fp = require('lodash/fp');
 
-var _fp2 = _interopRequireDefault(_fp);
+var _fp3 = _interopRequireDefault(_fp);
 
 var _mlPca = require('ml-pca');
 
 var _mlPca2 = _interopRequireDefault(_mlPca);
 
-var _vector = require('./vector');
+var _vector2 = require('./vector');
 
 var _norm = require('norm.js');
 
@@ -31,10 +31,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 // lodash/fp random has a fixed arity of 2, without the last (and useful) param
-var random = _fp2.default.random.convert({ fixed: false });
+var random = _fp3.default.random.convert({ fixed: false });
 
 // lodash/fp map has an iteratee with a single arg
-var mapWithIndex = _fp2.default.map.convert({ cap: false });
+var mapWithIndex = _fp3.default.map.convert({ cap: false });
 
 // A basic implementation of Kohonen map
 
@@ -95,7 +95,7 @@ var Kohonen = function () {
       if (data[ind].length !== data[0].length) {
         throw new Error('Kohonen constructor: all vectors should have the same size');
       }
-      var allNum = _fp2.default.reduce(function (seed, current) {
+      var allNum = _fp3.default.reduce(function (seed, current) {
         return seed && !isNaN(current) && isFinite(current);
       }, true, data[ind]);
       if (!allNum) {
@@ -140,9 +140,9 @@ var Kohonen = function () {
     }
 
     // then we store means and deviations for normalized datas
-    this.means = _fp2.default.flow(_fp2.default.unzip, _fp2.default.map(_d3Array.mean))(this.data);
+    this.means = _fp3.default.flow(_fp3.default.unzip, _fp3.default.map(_d3Array.mean))(this.data);
 
-    this.deviations = _fp2.default.flow(_fp2.default.unzip, _fp2.default.map(_d3Array.deviation))(this.data);
+    this.deviations = _fp3.default.flow(_fp3.default.unzip, _fp3.default.map(_d3Array.deviation))(this.data);
 
     // On each neuron, generate a random vector v
     // of <size> dimension
@@ -179,7 +179,7 @@ var Kohonen = function () {
   }, {
     key: 'mapping',
     value: function mapping() {
-      return _fp2.default.map(_fp2.default.flow(this.findBestMatchingUnit.bind(this), _fp2.default.get('pos')), this.data);
+      return _fp3.default.map(_fp3.default.flow(this.findBestMatchingUnit.bind(this), _fp3.default.get('pos')), this.data);
     }
   }, {
     key: 'classify',
@@ -229,13 +229,13 @@ var Kohonen = function () {
         return +(Math.round(num + "e+2") + "e-2");
       };
       var findNeighors = function findNeighors(cn) {
-        return _fp2.default.filter(function (n) {
-          return roundToTwo((0, _vector.dist)(n.pos, cn.pos)) === 1;
+        return _fp3.default.filter(function (n) {
+          return roundToTwo((0, _vector2.dist)(n.pos, cn.pos)) === 1;
         }, _this2.neurons);
       };
-      return _fp2.default.map(function (n) {
+      return _fp3.default.map(function (n) {
         return (0, _d3Array.mean)(findNeighors(n).map(function (nb) {
-          return (0, _vector.dist)(nb.v, n.v);
+          return (0, _vector2.dist)(nb.v, n.v);
         }));
       }, this.neurons);
     }
@@ -245,7 +245,7 @@ var Kohonen = function () {
   }, {
     key: 'generateLearningVector',
     value: function generateLearningVector() {
-      return this.data[_fp2.default.random(0, this.data.length - 1)];
+      return this.data[_fp3.default.random(0, this.data.length - 1)];
     }
   }, {
     key: 'generateInitialVectors',
@@ -274,17 +274,17 @@ var Kohonen = function () {
       });
 
       // we'll only keep the 2 largest eigenvectors
-      var transposedEV = _fp2.default.take(2, pca.getLoadings());
+      var transposedEV = _fp3.default.take(2, pca.getLoadings());
 
       // function to generate random vectors into eigenvectors space
       var generateRandomVecWithinEigenvectorsSpace = function generateRandomVecWithinEigenvectorsSpace() {
-        return (0, _vector.add)((0, _vector.mult)(transposedEV[0], random(-.5, .5, true)), (0, _vector.mult)(transposedEV[1], random(-.5, .5, true)));
+        return (0, _vector2.add)((0, _vector2.mult)(transposedEV[0], random(-.5, .5, true)), (0, _vector2.mult)(transposedEV[1], random(-.5, .5, true)));
       };
 
       // we generate all random vectors and uncentered them by adding means vector
-      return _fp2.default.map(function () {
-        return (0, _vector.add)(generateRandomVecWithinEigenvectorsSpace(), _this3.means);
-      }, _fp2.default.range(0, this.numNeurons));
+      return _fp3.default.map(function () {
+        return (0, _vector2.add)(generateRandomVecWithinEigenvectorsSpace(), _this3.means);
+      }, _fp3.default.range(0, this.numNeurons));
     }
   }, {
     key: 'learn',
@@ -302,10 +302,10 @@ var Kohonen = function () {
         var currentNeighborhood = _this4.neighborhood({ bmu: bmu, n: n });
 
         // compute delta for the current neuron
-        var delta = (0, _vector.mult)((0, _vector.diff)(n.v, v), currentNeighborhood * currentLearningCoef);
+        var delta = (0, _vector2.mult)((0, _vector2.diff)(n.v, v), currentNeighborhood * currentLearningCoef);
 
         // update current vector
-        n.v = (0, _vector.add)(n.v, delta);
+        n.v = (0, _vector2.add)(n.v, delta);
       });
       this.step += 1;
     }
@@ -318,7 +318,7 @@ var Kohonen = function () {
       var _this5 = this;
 
       var target = v;
-      var _neurons = _fp2.default.cloneDeep(this.neurons);
+      var _neurons = _fp3.default.cloneDeep(this.neurons);
 
       if (this.classPlanes) {
         // do not include class plane data in finding best matching unit.
@@ -329,9 +329,22 @@ var Kohonen = function () {
         });
       }
 
-      return _fp2.default.flow(_fp2.default.orderBy(function (n) {
+      var bmuTruncated = _fp2.default.flow(_fp2.default.orderBy(function (n) {
         return (0, _vector.dist)(target, n.v);
       }, 'asc'), _fp2.default.first)(_neurons);
+
+      if (!this.classPlanes) {
+        return bmuTruncated;
+      }
+
+      var output = null;
+      this.neurons.forEach(function (item) {
+        if (item.pos[0] === bmuTruncated.pos[0] && item.pos[1] === bmuTruncated.pos[1]) {
+          output = item;
+        }
+      });
+
+      return output;
     }
 
     // http://en.wikipedia.org/wiki/Gaussian_function#Two-dimensional_Gaussian_function
