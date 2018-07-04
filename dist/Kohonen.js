@@ -196,7 +196,7 @@ var Kohonen = function () {
 
         // store best matching unit and class index
         classMap.push([bmu.pos, classLabels]);
-        posiitions.push(bmu.pos);
+        positions.push(bmu.pos);
       });
 
       // loop through all positions
