@@ -161,11 +161,12 @@ class Kohonen {
     var classMap = [];
     var positions = [];
     this.hitCount = [];
+    that = this;
 
     // loop through all data and match classes to positions
     this.data.forEach(function(item) {
-      var classLabels = item.slice(-this.classPlanes.length);
-      var bmu = this.findBestMatchingUnit(item);
+      var classLabels = item.slice(-that.classPlanes.length);
+      var bmu = that.findBestMatchingUnit(item);
 
       // store best matching unit and class index
       classMap.push([bmu.pos, classLabels]);
@@ -179,7 +180,7 @@ class Kohonen {
         return result[0] === position;
       });
 
-      var hits = new Array(this.classPlanes.length).fill(0);
+      var hits = new Array(that.classPlanes.length).fill(0);
       matches.forEach(function(match) {
         hits = add(hits, match[1]);
       });
