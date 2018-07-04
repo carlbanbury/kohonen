@@ -161,7 +161,7 @@ class Kohonen {
     var classMap = [];
     var positions = [];
     this.hitCount = [];
-    that = this;
+    var that = this;
 
     // loop through all data and match classes to positions
     this.data.forEach(function(item) {
