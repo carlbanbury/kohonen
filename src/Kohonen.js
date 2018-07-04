@@ -157,8 +157,61 @@ class Kohonen {
     );
   }
 
+  hitMap() {
+    var classMap = [];
+    var positions = [];
+    this.hitCount = [];
+
+    // loop through all data and match classes to positions
+    this.data.forEach(function(item) {
+      var classLabels = item.slice(-this.classPlanes.length);
+      var bmu = this.findBestMatchingUnit(item);
+
+      // store best matching unit and class index
+      classMap.push([bmu.pos, classLabels]);
+      posiitions.push(bmu.pos);
+    });
+    
+    // loop through all positions
+    positions.forEach(function(position) {
+      // filter and sum class indexes to get hit count
+      var matches = classMap.filter(function(result) {
+        return result[0] === position;
+      });
+
+      var hits = new Array(this.classPlanes.length).fill(0);
+      matches.forEach(function(match) {
+        hits = add(hits, match[1]);
+      });
+
+      meta = {hits: hits, winner: _.indexOf(hits, _.max(hits))};
+      this.hitCount.push([position, meta]);
+    });
+  }
+
+  classifyHits(test) {
+    test = n.normalize(test, 'max');
+
+    if (!this.hitCount) {
+      return null;
+    }
+
+    var bmu = this.findBestMatchingUnit(test);
+    var match = this.hitCount.filter(function(item) {
+      return item[0] === bmu.pos;
+    });
+
+    if (match) {
+      return match[0];
+    }
+
+    return null;
+  }
+
   classify(test, threshold) {
     test = n.normalize(test, 'max');
+
+
     if (!this.classPlanes) {
       return null;
     }
@@ -244,7 +297,6 @@ class Kohonen {
 
   learn(v) {
     // find bmu
-    // TODO: Remove classPlane data from finding best matching unit
     const bmu = this.findBestMatchingUnit(v);
     // compute current learning coef
     const currentLearningCoef = this.scaleStepLearningCoef(this.step);

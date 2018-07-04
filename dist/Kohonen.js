@@ -182,9 +182,63 @@ var Kohonen = function () {
       return _fp2.default.map(_fp2.default.flow(this.findBestMatchingUnit.bind(this), _fp2.default.get('pos')), this.data);
     }
   }, {
+    key: 'hitMap',
+    value: function hitMap() {
+      var classMap = [];
+      var positions = [];
+      this.hitCount = [];
+
+      // loop through all data and match classes to positions
+      this.data.forEach(function (item) {
+        var classLabels = item.slice(-this.classPlanes.length);
+        var bmu = this.findBestMatchingUnit(item);
+
+        // store best matching unit and class index
+        classMap.push([bmu.pos, classLabels]);
+        posiitions.push(bmu.pos);
+      });
+
+      // loop through all positions
+      positions.forEach(function (position) {
+        // filter and sum class indexes to get hit count
+        var matches = classMap.filter(function (result) {
+          return result[0] === position;
+        });
+
+        var hits = new Array(this.classPlanes.length).fill(0);
+        matches.forEach(function (match) {
+          hits = (0, _vector.add)(hits, match[1]);
+        });
+
+        meta = { hits: hits, winner: _fp2.default.indexOf(hits, _fp2.default.max(hits)) };
+        this.hitCount.push([position, meta]);
+      });
+    }
+  }, {
+    key: 'classifyHits',
+    value: function classifyHits(test) {
+      test = _norm2.default.normalize(test, 'max');
+
+      if (!this.hitCount) {
+        return null;
+      }
+
+      var bmu = this.findBestMatchingUnit(test);
+      var match = this.hitCount.filter(function (item) {
+        return item[0] === bmu.pos;
+      });
+
+      if (match) {
+        return match[0];
+      }
+
+      return null;
+    }
+  }, {
     key: 'classify',
     value: function classify(test, threshold) {
       test = _norm2.default.normalize(test, 'max');
+
       if (!this.classPlanes) {
         return null;
       }
@@ -288,7 +342,6 @@ var Kohonen = function () {
       var _this4 = this;
 
       // find bmu
-      // TODO: Remove classPlane data from finding best matching unit
       var bmu = this.findBestMatchingUnit(v);
       // compute current learning coef
       var currentLearningCoef = this.scaleStepLearningCoef(this.step);
