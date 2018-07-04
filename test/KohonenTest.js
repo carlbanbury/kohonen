@@ -284,7 +284,7 @@ describe('Kohonen 1', ()=> {
       ]
       const k = new Kohonen({ data: data, neurons: generateGrid(3, 3), classPlanes: ['a', 'b'], randomStart: true});
       k.training();
-      const test = k.classify([0, 0, 0], 0.5);
+      const test = k.classify([0, 0, 0], 0.9);
       assert.equal(test.className, undefined);
       assert.equal(test.index, null);
     });

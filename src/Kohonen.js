@@ -211,16 +211,21 @@ class Kohonen {
   classify(test, threshold) {
     test = n.normalize(test, 'max');
 
-
     if (!this.classPlanes) {
       return null;
     }
+
+    var classData = test.slice(-this.classPlanes.length);
+    var testData = test.slice(0,test.length-this.classPlanes.length);
+    testData = n.normalize(testData, 'max');
+    testData = testData.concat(classData);
+
 
     if (!threshold) {
       threshold = 0;
     }
 
-    var bmu = this.findBestMatchingUnit(test);
+    var bmu = this.findBestMatchingUnit(testData);
 
     var classes = bmu.v.slice(bmu.v.length-this.classPlanes.length, bmu.v.length);
     var index = undefined;
@@ -331,13 +336,26 @@ class Kohonen {
       });
     }
 
-    return _.flow(
+    var bmuTruncated = _.flow(
       _.orderBy(
         n => dist(target, n.v),
         'asc',
       ),
       _.first
-    )(_neurons);
+    )(_neurons)
+
+    if (!this.classPlanes) {
+      return bmuTruncated;
+    }
+
+    var output = null;
+    this.neurons.forEach(function(item) {
+      if (item.pos[0] === bmuTruncated.pos[0] && item.pos[1] === bmuTruncated.pos[1]) {
+        output = item;
+      }
+    });
+
+    return output;
   }
 
   // http://en.wikipedia.org/wiki/Gaussian_function#Two-dimensional_Gaussian_function

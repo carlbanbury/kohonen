@@ -243,11 +243,16 @@ var Kohonen = function () {
         return null;
       }
 
+      var classData = test.slice(-this.classPlanes.length);
+      var testData = test.slice(0, test.length - this.classPlanes.length);
+      testData = _norm2.default.normalize(testData, 'max');
+      testData = testData.concat(classData);
+
       if (!threshold) {
         threshold = 0;
       }
 
-      var bmu = this.findBestMatchingUnit(test);
+      var bmu = this.findBestMatchingUnit(testData);
 
       var classes = bmu.v.slice(bmu.v.length - this.classPlanes.length, bmu.v.length);
       var index = undefined;
@@ -378,9 +383,22 @@ var Kohonen = function () {
         });
       }
 
-      return _fp2.default.flow(_fp2.default.orderBy(function (n) {
+      var bmuTruncated = _fp2.default.flow(_fp2.default.orderBy(function (n) {
         return (0, _vector.dist)(target, n.v);
       }, 'asc'), _fp2.default.first)(_neurons);
+
+      if (!this.classPlanes) {
+        return bmuTruncated;
+      }
+
+      var output = null;
+      this.neurons.forEach(function (item) {
+        if (item.pos[0] === bmuTruncated.pos[0] && item.pos[1] === bmuTruncated.pos[1]) {
+          output = item;
+        }
+      });
+
+      return output;
     }
 
     // http://en.wikipedia.org/wiki/Gaussian_function#Two-dimensional_Gaussian_function
