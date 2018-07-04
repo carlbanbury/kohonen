@@ -211,7 +211,7 @@ var Kohonen = function () {
           hits = (0, _vector.add)(hits, match[1]);
         });
 
-        meta = { hits: hits, winner: _fp2.default.indexOf(hits, _fp2.default.max(hits)) };
+        var meta = { hits: hits, winner: _fp2.default.indexOf(hits, _fp2.default.max(hits)) };
         this.hitCount.push([position, meta]);
       });
     }

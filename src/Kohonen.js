@@ -185,7 +185,7 @@ class Kohonen {
         hits = add(hits, match[1]);
       });
 
-      meta = {hits: hits, winner: _.indexOf(hits, _.max(hits))};
+      var meta = {hits: hits, winner: _.indexOf(hits, _.max(hits))};
       this.hitCount.push([position, meta]);
     });
   }
