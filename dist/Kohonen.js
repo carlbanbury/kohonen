@@ -184,6 +184,7 @@ var Kohonen = function () {
   }, {
     key: 'hitMap',
     value: function hitMap() {
+      var that = this;
       var classMap = [];
       var positions = [];
       this.hitCount = [];
@@ -212,7 +213,7 @@ var Kohonen = function () {
         });
 
         var meta = { hits: hits, winner: _fp2.default.indexOf(hits, _fp2.default.max(hits)) };
-        this.hitCount.push([position, meta]);
+        that.hitCount.push([position, meta]);
       });
     }
   }, {

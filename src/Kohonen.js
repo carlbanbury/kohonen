@@ -158,6 +158,7 @@ class Kohonen {
   }
 
   hitMap() {
+    var that = this;
     var classMap = [];
     var positions = [];
     this.hitCount = [];
@@ -186,7 +187,7 @@ class Kohonen {
       });
 
       var meta = {hits: hits, winner: _.indexOf(hits, _.max(hits))};
-      this.hitCount.push([position, meta]);
+      that.hitCount.push([position, meta]);
     });
   }
 
