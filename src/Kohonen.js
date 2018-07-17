@@ -200,7 +200,12 @@ class Kohonen {
 
   classifyHits(test) {
     if (this.norm) {
-      test = n.normalize(test, 'max');
+        // make sure we only normalize the data and not the class planes!!!
+        var classData = test.slice(-this.classPlanes.length);
+        var testData = test.slice(0,test.length-this.classPlanes.length);
+
+        testData = n.normalize(testData, 'max');
+        test = testData.concat(classData);
     }
     
 
@@ -221,27 +226,26 @@ class Kohonen {
   }
 
   classify(test, threshold) {
-    if (this.norm) {
-      test = n.normalize(test, 'max');
-    }
-    
     if (!this.classPlanes) {
       return null;
     }
 
-    var classData = test.slice(-this.classPlanes.length);
-    var testData = test.slice(0,test.length-this.classPlanes.length);
-    testData = n.normalize(testData, 'max');
-    testData = testData.concat(classData);
+    if (this.norm) {
+        // make sure we only normalize the data and not the class planes!!!
+        var classData = test.slice(-this.classPlanes.length);
+        var testData = test.slice(0,test.length-this.classPlanes.length);
 
+        testData = n.normalize(testData, 'max');
+        test = testData.concat(classData);
+    }
 
     if (!threshold) {
       threshold = 0;
     }
 
-    var bmu = this.findBestMatchingUnit(testData);
+    var bmu = this.findBestMatchingUnit(test);
 
-    var classes = bmu.v.slice(bmu.v.length-this.classPlanes.length, bmu.v.length);
+    var classes = bmu.v.slice(bmu.v.length-this.classPlanes.length);
     var index = undefined;
     var temp = null;
     for (var i=0; i<classes.length; i++) {
