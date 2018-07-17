@@ -45,7 +45,8 @@ class Kohonen {
     minNeighborhood = .3,
     maxNeighborhood = 1,
     randomStart = false,
-    classPlanes = undefined
+    classPlanes = undefined,
+    norm = true
   }) {
 
     // data vectors should have at least one dimension
@@ -74,6 +75,7 @@ class Kohonen {
     this.step = 0;
     this.maxStep = maxStep;
     this.randomStart = randomStart;
+    this.norm = norm
 
     // generate scaleStepLearningCoef,
     // as the learning coef decreases with time
@@ -98,7 +100,12 @@ class Kohonen {
     }
 
     // build normalized data
-    this.data = this.normalize(this._data);
+    if (this.norm) {
+      this.data = this.normalize(this._data);
+    } else {
+      this.data = this._data;
+    }
+    
 
     // Append class information back to data now data has been normalized
     if (this.classPlanes) {
@@ -192,7 +199,10 @@ class Kohonen {
   }
 
   classifyHits(test) {
-    test = n.normalize(test, 'max');
+    if (this.norm) {
+      test = n.normalize(test, 'max');
+    }
+    
 
     if (!this.hitCount) {
       return null;
@@ -211,8 +221,10 @@ class Kohonen {
   }
 
   classify(test, threshold) {
-    test = n.normalize(test, 'max');
-
+    if (this.norm) {
+      test = n.normalize(test, 'max');
+    }
+    
     if (!this.classPlanes) {
       return null;
     }

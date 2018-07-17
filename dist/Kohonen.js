@@ -80,7 +80,9 @@ var Kohonen = function () {
         _ref$randomStart = _ref.randomStart,
         randomStart = _ref$randomStart === undefined ? false : _ref$randomStart,
         _ref$classPlanes = _ref.classPlanes,
-        classPlanes = _ref$classPlanes === undefined ? undefined : _ref$classPlanes;
+        classPlanes = _ref$classPlanes === undefined ? undefined : _ref$classPlanes,
+        _ref$norm = _ref.norm,
+        norm = _ref$norm === undefined ? true : _ref$norm;
 
     _classCallCheck(this, Kohonen);
 
@@ -108,6 +110,7 @@ var Kohonen = function () {
     this.step = 0;
     this.maxStep = maxStep;
     this.randomStart = randomStart;
+    this.norm = norm;
 
     // generate scaleStepLearningCoef,
     // as the learning coef decreases with time
@@ -130,7 +133,11 @@ var Kohonen = function () {
     }
 
     // build normalized data
-    this.data = this.normalize(this._data);
+    if (this.norm) {
+      this.data = this.normalize(this._data);
+    } else {
+      this.data = this._data;
+    }
 
     // Append class information back to data now data has been normalized
     if (this.classPlanes) {
@@ -219,7 +226,9 @@ var Kohonen = function () {
   }, {
     key: 'classifyHits',
     value: function classifyHits(test) {
-      test = _norm2.default.normalize(test, 'max');
+      if (this.norm) {
+        test = _norm2.default.normalize(test, 'max');
+      }
 
       if (!this.hitCount) {
         return null;
@@ -239,7 +248,9 @@ var Kohonen = function () {
   }, {
     key: 'classify',
     value: function classify(test, threshold) {
-      test = _norm2.default.normalize(test, 'max');
+      if (this.norm) {
+        test = _norm2.default.normalize(test, 'max');
+      }
 
       if (!this.classPlanes) {
         return null;
