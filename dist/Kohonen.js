@@ -207,24 +207,6 @@ var Kohonen = function () {
         positions.push(bmu.pos);
       });
 
-      runs++;
-      var classes = testSpectrum.slice(-5);
-      var guess = -1;
-
-      var output = k.classifyHits(_fp2.default.cloneDeep(testSpectrum));
-      if (output && output[1]) {
-        var maxthing = _fp2.default.max(output[1].hits);
-        var guess = output[1].hits.indexOf(maxthing);
-        var check = output[1].hits.lastIndexOf(maxthing);
-      }
-
-      var classes = testSpectrum.slice(-5);
-      if (check === guess) {
-        if (classes[guess] === 1) {
-          correct = correct + 1;
-        }
-      }
-
       // loop through all positions
       positions.forEach(function (position) {
         // filter and sum class indexes to get hit count
