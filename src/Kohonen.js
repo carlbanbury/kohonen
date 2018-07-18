@@ -180,6 +180,24 @@ class Kohonen {
       classMap.push([bmu.pos, classLabels]);
       positions.push(bmu.pos);
     });
+
+      runs ++;
+  var classes = testSpectrum.slice(-5);
+  var guess = -1;
+
+  var output = k.classifyHits(_.cloneDeep(testSpectrum));
+  if (output && output[1]) {
+    var maxthing = _.max(output[1].hits);
+    var guess = output[1].hits.indexOf(maxthing);
+    var check = output[1].hits.lastIndexOf(maxthing);
+  }
+
+  var classes = testSpectrum.slice(-5);
+  if (check === guess) {
+    if (classes[guess] === 1) {
+      correct = correct + 1;
+    }
+  }
     
     // loop through all positions
     positions.forEach(function(position) {
@@ -193,7 +211,16 @@ class Kohonen {
         hits = add(hits, match[1]);
       });
 
-      var meta = {hits: hits, winner: _.indexOf(hits, _.max(hits))};
+      var winner = -1;
+      var maxCount = _.max(hits);
+      var guess = hits.indexOf(maxCount);
+      var check = hits.lastIndexOf(maxCount);
+
+      if (guess === check) {
+        winner = guess;
+      }
+
+      var meta = {hits: hits, winner: winner};
       that.hitCount.push([position, meta]);
     });
   }

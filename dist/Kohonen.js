@@ -207,6 +207,24 @@ var Kohonen = function () {
         positions.push(bmu.pos);
       });
 
+      runs++;
+      var classes = testSpectrum.slice(-5);
+      var guess = -1;
+
+      var output = k.classifyHits(_fp2.default.cloneDeep(testSpectrum));
+      if (output && output[1]) {
+        var maxthing = _fp2.default.max(output[1].hits);
+        var guess = output[1].hits.indexOf(maxthing);
+        var check = output[1].hits.lastIndexOf(maxthing);
+      }
+
+      var classes = testSpectrum.slice(-5);
+      if (check === guess) {
+        if (classes[guess] === 1) {
+          correct = correct + 1;
+        }
+      }
+
       // loop through all positions
       positions.forEach(function (position) {
         // filter and sum class indexes to get hit count
@@ -219,7 +237,16 @@ var Kohonen = function () {
           hits = (0, _vector.add)(hits, match[1]);
         });
 
-        var meta = { hits: hits, winner: _fp2.default.indexOf(hits, _fp2.default.max(hits)) };
+        var winner = -1;
+        var maxCount = _fp2.default.max(hits);
+        var guess = hits.indexOf(maxCount);
+        var check = hits.lastIndexOf(maxCount);
+
+        if (guess === check) {
+          winner = guess;
+        }
+
+        var meta = { hits: hits, winner: winner };
         that.hitCount.push([position, meta]);
       });
     }
@@ -227,7 +254,12 @@ var Kohonen = function () {
     key: 'classifyHits',
     value: function classifyHits(test) {
       if (this.norm) {
-        test = _norm2.default.normalize(test, 'max');
+        // make sure we only normalize the data and not the class planes!!!
+        var classData = test.slice(-this.classPlanes.length);
+        var testData = test.slice(0, test.length - this.classPlanes.length);
+
+        testData = _norm2.default.normalize(testData, 'max');
+        test = testData.concat(classData);
       }
 
       if (!this.hitCount) {
@@ -248,26 +280,26 @@ var Kohonen = function () {
   }, {
     key: 'classify',
     value: function classify(test, threshold) {
-      if (this.norm) {
-        test = _norm2.default.normalize(test, 'max');
-      }
-
       if (!this.classPlanes) {
         return null;
       }
 
-      var classData = test.slice(-this.classPlanes.length);
-      var testData = test.slice(0, test.length - this.classPlanes.length);
-      testData = _norm2.default.normalize(testData, 'max');
-      testData = testData.concat(classData);
+      if (this.norm) {
+        // make sure we only normalize the data and not the class planes!!!
+        var classData = test.slice(-this.classPlanes.length);
+        var testData = test.slice(0, test.length - this.classPlanes.length);
+
+        testData = _norm2.default.normalize(testData, 'max');
+        test = testData.concat(classData);
+      }
 
       if (!threshold) {
         threshold = 0;
       }
 
-      var bmu = this.findBestMatchingUnit(testData);
+      var bmu = this.findBestMatchingUnit(test);
 
-      var classes = bmu.v.slice(bmu.v.length - this.classPlanes.length, bmu.v.length);
+      var classes = bmu.v.slice(bmu.v.length - this.classPlanes.length);
       var index = undefined;
       var temp = null;
       for (var i = 0; i < classes.length; i++) {
