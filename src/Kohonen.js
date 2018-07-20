@@ -2,8 +2,7 @@ import { scaleLinear } from 'd3-scale';
 import { extent, mean, deviation } from 'd3-array';
 import _ from 'lodash/fp';
 import PCA from 'ml-pca';
-import { dist, mult, diff, add } from './vector';
-import n from 'norm.js';
+import { dist, mult, diff, add, normalize } from './vector';
 
 // lodash/fp random has a fixed arity of 2, without the last (and useful) param
 const random = _.random.convert({ fixed: false });
@@ -128,7 +127,7 @@ class Kohonen {
   normalize(data) {
     // TODO: Scale this properly between 0 and 1
     data.forEach(function(item, index) {
-      data[index] = n.normalize(item, 'max');
+      data[index] = normalize(item);
     });
     return data;
   }
@@ -160,8 +159,8 @@ class Kohonen {
         neuron.somdi = self.updateStep(neuron.somdi, sampleSOMDI, scaleFactor);
       });
 
-      log(this.neurons, this.step);
       this.step += 1;
+      log(this.neurons, this.step);
     }
   }
 

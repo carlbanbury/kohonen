@@ -19,6 +19,16 @@ export const diff = (v1, v2) => v1.map((val, i) => v2[i] - val);
 // scalar addition of a vector
 export const add = (v1, v2) => v1.map((val, i) => v2[i] + val);
 
+// scale vector between 0 and 1
+export const normalize = function(v) {
+	var max = _.max(v);
+	var min = _.min(v);
+	var range = max - min;
+	v.map(function(x) {
+		return (x - min) / range;
+	});	
+};
+
 // For a given size, return an array of `size` with random values
 // within the gaussian normalization
 //

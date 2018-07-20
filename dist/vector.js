@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.random = exports.add = exports.diff = exports.mult = exports.dist = undefined;
+exports.random = exports.normalize = exports.add = exports.diff = exports.mult = exports.dist = undefined;
 
 var _fp = require('lodash/fp');
 
@@ -42,6 +42,16 @@ var diff = exports.diff = function diff(v1, v2) {
 var add = exports.add = function add(v1, v2) {
   return v1.map(function (val, i) {
     return v2[i] + val;
+  });
+};
+
+// scale vector between 0 and 1
+var normalize = exports.normalize = function normalize(v) {
+  var max = _fp2.default.max(v);
+  var min = _fp2.default.min(v);
+  var range = max - min;
+  v.map(function (x) {
+    return (x - min) / range;
   });
 };
 

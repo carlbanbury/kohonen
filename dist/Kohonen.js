@@ -20,10 +20,6 @@ var _mlPca2 = _interopRequireDefault(_mlPca);
 
 var _vector = require('./vector');
 
-var _norm = require('norm.js');
-
-var _norm2 = _interopRequireDefault(_norm);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -156,7 +152,7 @@ var Kohonen = function () {
     value: function normalize(data) {
       // TODO: Scale this properly between 0 and 1
       data.forEach(function (item, index) {
-        data[index] = _norm2.default.normalize(item, 'max');
+        data[index] = (0, _vector.normalize)(item);
       });
       return data;
     }
@@ -195,8 +191,8 @@ var Kohonen = function () {
           neuron.somdi = self.updateStep(neuron.somdi, sampleSOMDI, scaleFactor);
         });
 
-        log(_this.neurons, _this.step);
         _this.step += 1;
+        log(_this.neurons, _this.step);
       };
 
       for (var i = 0; i < this.maxStep; i++) {
