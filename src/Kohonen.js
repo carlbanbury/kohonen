@@ -142,7 +142,7 @@ class Kohonen {
       var sample = this._data.v[sampleIndex];
 
       // find bmu
-      const bmu = this.findBestMatchingUnit(sampleIndex);
+      const bmu = this.findBestMatchingUnit(sample);
 
       // compute current learning coef
       const currentLearningCoef = this.scaleStepLearningCoef(this.step);
@@ -186,14 +186,11 @@ class Kohonen {
   // expects an array of test samples and array of labels with corresponding indexes
   // e.g. testData = [[1, 0, 0], [0, 0, 1], [0, 1, 0]]; testLabels = [1, 0, 2]
   predict(testData, testLabels) {
-    var self;
-    if (!this.labels) {
-      return null;
-    }
+    var self = this;
 
     // normalise the test data if norm enabled
     if (this.norm) {
-      testData = self.normalize(testData)
+      testData = self.normalize(testData);
     }
 
     var results = [];
@@ -240,8 +237,7 @@ class Kohonen {
   }
 
   // Find closer neuron
-  findBestMatchingUnit(index) {
-    var target = this._data.v[index];
+  findBestMatchingUnit(target) {
     var _neurons = _.cloneDeep(this.neurons);
 
     return _.flow(

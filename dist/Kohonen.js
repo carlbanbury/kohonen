@@ -177,7 +177,7 @@ var Kohonen = function () {
 
         // find bmu
 
-        var bmu = _this.findBestMatchingUnit(sampleIndex);
+        var bmu = _this.findBestMatchingUnit(sample);
 
         // compute current learning coef
         var currentLearningCoef = _this.scaleStepLearningCoef(_this.step);
@@ -233,10 +233,7 @@ var Kohonen = function () {
   }, {
     key: 'predict',
     value: function predict(testData, testLabels) {
-      var self;
-      if (!this.labels) {
-        return null;
-      }
+      var self = this;
 
       // normalise the test data if norm enabled
       if (this.norm) {
@@ -299,8 +296,7 @@ var Kohonen = function () {
 
   }, {
     key: 'findBestMatchingUnit',
-    value: function findBestMatchingUnit(index) {
-      var target = this._data.v[index];
+    value: function findBestMatchingUnit(target) {
       var _neurons = _fp2.default.cloneDeep(this.neurons);
 
       return _fp2.default.flow(_fp2.default.orderBy(function (n) {
