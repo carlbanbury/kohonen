@@ -96,7 +96,7 @@ class Kohonen {
     // On each neuron, generate a random vector v
     // of <size> dimension
     // each neuron has [{weight: <vector>, somdi: <vector>, pos: <vector>}]
-    const randomInitialVectors = this.generateInitialVectors();
+    const randomInitialVectors = this.generateInitialVectors(labels);
     this.neurons = neurons.map(function(neuron, index) {
       var item = randomInitialVectors[index];
       item.pos = neuron.pos;
@@ -215,14 +215,14 @@ class Kohonen {
     return _.random(0, this._data.v.length - 1);
   }
 
-  generateInitialVectors() {
+  generateInitialVectors(labels) {
     var output = [];
     for (var i=0; i<this.numNeurons; i++) {
       var vectorLength = this._data.v[0].length;
 
       var somdi = null;
 
-      if (this.labels) {
+      if (labels) {
         var somdiLength = this._data.somdi[0].length;
         var somdi = Array(somdiLength).fill(0).map(()=>Math.random());
       }
