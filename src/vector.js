@@ -24,7 +24,7 @@ export const normalize = function(v) {
 	var max = _.max(v);
 	var min = _.min(v);
 	var range = max - min;
-	v.map(function(x) {
+	return v.map(function(x) {
 		return (x - min) / range;
 	});	
 };
