@@ -173,13 +173,14 @@ class Kohonen {
   }
 
   mapping() {
-    return _.map(
-      _.flow(
-        this.findBestMatchingUnit.bind(this),
-        _.get('pos'),
-      ),
-      this._data.v
-    );
+    // TODO: can do hit count in mapping
+    // TODO: can also output class
+    var positions = [];
+    for (var i=0; i<this._data.v.length; i++) {
+      positions.push(this.findBestMatchingUnit(i).pos);
+    }
+
+    return positions;
   }
 
   // expects an array of test samples and array of labels with corresponding indexes
