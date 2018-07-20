@@ -217,7 +217,7 @@ var Kohonen = function () {
   }, {
     key: 'mapping',
     value: function mapping() {
-      return _fp2.default.map(_fp2.default.flow(this.findBestMatchingUnit.bind(this), _fp2.default.get('pos')), this.data);
+      return _fp2.default.map(_fp2.default.flow(this.findBestMatchingUnit.bind(this), _fp2.default.get('pos')), this._data.v);
     }
 
     // expects an array of test samples and array of labels with corresponding indexes

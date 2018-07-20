@@ -178,7 +178,7 @@ class Kohonen {
         this.findBestMatchingUnit.bind(this),
         _.get('pos'),
       ),
-      this.data
+      this._data.v
     );
   }
 
