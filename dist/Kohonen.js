@@ -252,6 +252,8 @@ var Kohonen = function () {
         var winningIndex = somdi.indexOf(_fp2.default.max(somdi));
         results.push(winningIndex);
       });
+
+      return results;
     }
   }, {
     key: 'weights',

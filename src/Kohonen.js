@@ -205,6 +205,8 @@ class Kohonen {
        var winningIndex = somdi.indexOf(_.max(somdi));
        results.push(winningIndex);
     });
+
+    return results;
   }
 
   weights() {
