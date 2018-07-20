@@ -184,7 +184,7 @@ var Kohonen = function () {
 
         _this.neurons.forEach(function (neuron) {
           // compute neighborhood
-          var currentNeighborhood = self.neighborhood({ bmu: bmu, neuron: neuron });
+          var currentNeighborhood = self.neighborhood(bmu, neuron);
           var scaleFactor = currentNeighborhood * currentLearningCoef;
 
           // update weights for neuron
@@ -307,15 +307,12 @@ var Kohonen = function () {
 
   }, {
     key: 'neighborhood',
-    value: function neighborhood(_ref2) {
-      var bmu = _ref2.bmu,
-          n = _ref2.n;
-
+    value: function neighborhood(bmu, neuron) {
       var a = 1;
       var sigmaX = 1;
       var sigmaY = 1;
 
-      return a * Math.exp(-(Math.pow(n.pos[0] - bmu.pos[0], 2) / 2 * Math.pow(sigmaX, 2) + Math.pow(n.pos[1] - bmu.pos[1], 2) / 2 * Math.pow(sigmaY, 2))) * this.scaleStepNeighborhood(this.step);
+      return a * Math.exp(-(Math.pow(neuron.pos[0] - bmu.pos[0], 2) / 2 * Math.pow(sigmaX, 2) + Math.pow(neuron.pos[1] - bmu.pos[1], 2) / 2 * Math.pow(sigmaY, 2))) * this.scaleStepNeighborhood(this.step);
     }
 
     // The U-Matrix value of a particular node

@@ -149,7 +149,7 @@ class Kohonen {
 
       this.neurons.forEach(neuron => {
         // compute neighborhood
-        const currentNeighborhood = self.neighborhood({ bmu, neuron });
+        const currentNeighborhood = self.neighborhood(bmu, neuron);
         const scaleFactor = currentNeighborhood * currentLearningCoef;
 
         // update weights for neuron
@@ -255,14 +255,14 @@ class Kohonen {
   // http://mathworld.wolfram.com/GaussianFunction.html
   //
   // neighborhood function made with a gaussian
-  neighborhood({ bmu, n }) {
+  neighborhood(bmu, neuron) {
     const a = 1;
     const sigmaX = 1;
     const sigmaY = 1;
 
     return a
       * Math.exp(
-        -(Math.pow(n.pos[0] - bmu.pos[0], 2) / 2 * Math.pow(sigmaX, 2) + Math.pow(n.pos[1] - bmu.pos[1], 2) / 2 * Math.pow(sigmaY, 2))
+        -(Math.pow(neuron.pos[0] - bmu.pos[0], 2) / 2 * Math.pow(sigmaX, 2) + Math.pow(neuron.pos[1] - bmu.pos[1], 2) / 2 * Math.pow(sigmaY, 2))
       )
       * this.scaleStepNeighborhood(this.step);
   }
