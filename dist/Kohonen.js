@@ -134,6 +134,7 @@ var Kohonen = function () {
     key: 'seedLabels',
     value: function seedLabels(data, labels) {
       var numClasses = _fp2.default.max(labels) + 1;
+      var out = { v: [], labels: [], somdi: [] };
       data.map(function (item, index) {
         var somdi = [];
 
@@ -143,8 +144,12 @@ var Kohonen = function () {
           somdi[currentLabel] = 1;
         }
 
-        return { v: item, label: currentLabel, somdi: somdi };
+        out.v.push(item);
+        out.labels.push(currentLabel);
+        out.somdi.push(somdi);
       });
+
+      return out;
     }
   }, {
     key: 'normalize',

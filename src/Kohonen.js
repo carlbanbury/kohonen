@@ -107,6 +107,7 @@ class Kohonen {
   // bind the labels and create SOMDI vectors
   seedLabels(data, labels) {
     var numClasses = _.max(labels) + 1;
+    var out = {v: [], labels: [], somdi: []}
     data.map(function(item, index) {
       var somdi = [];
 
@@ -115,9 +116,13 @@ class Kohonen {
         var somdi = new Array(numClasses).fill(0);
         somdi[currentLabel] = 1;
       }
-      
-      return {v: item, label: currentLabel, somdi: somdi}
+
+      out.v.push(item);
+      out.labels.push(currentLabel);
+      out.somdi.push(somdi);
     });
+
+    return out;
   }
 
   normalize(data) {
