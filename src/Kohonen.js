@@ -1,7 +1,6 @@
 import { scaleLinear } from 'd3-scale';
 import { extent, mean, deviation } from 'd3-array';
 import _ from 'lodash/fp';
-import PCA from 'ml-pca';
 import { dist, mult, diff, add, normalize } from './vector';
 
 // lodash/fp random has a fixed arity of 2, without the last (and useful) param

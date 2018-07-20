@@ -14,10 +14,6 @@ var _fp = require('lodash/fp');
 
 var _fp2 = _interopRequireDefault(_fp);
 
-var _mlPca = require('ml-pca');
-
-var _mlPca2 = _interopRequireDefault(_mlPca);
-
 var _vector = require('./vector');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
