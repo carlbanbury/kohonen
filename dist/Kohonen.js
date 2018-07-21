@@ -190,7 +190,9 @@ var Kohonen = function () {
         });
 
         _this.step += 1;
-        log(_this.neurons, _this.step);
+        if (log) {
+          log(_this.neurons, _this.step);
+        }
       };
 
       for (var i = 0; i < this.maxStep; i++) {
@@ -222,7 +224,7 @@ var Kohonen = function () {
         if (match) {
           // find out what class we think this neuron is
           var criteria = self.maxIndex(match.neuron.somdi);
-          if (self.classifer === hits) {
+          if (self.classifer === 'hits') {
             criteria = self.maxIndex(match.neuron.hits);
           }
 
@@ -237,7 +239,9 @@ var Kohonen = function () {
         }
 
         self.step += 1;
-        log(self.neurons, self.step);
+        if (log) {
+          log(self.neurons, self.step);
+        }
       }
     }
   }, {
@@ -251,7 +255,7 @@ var Kohonen = function () {
         converge = true;
       }
 
-      var error = (0, _vector.diff)(neuron.weight, sample);
+      var error = (0, _vector.diff)(weight, sample);
       var delta = (0, _vector.mult)(error, scaleFactor);
 
       if (converge) {
@@ -327,16 +331,16 @@ var Kohonen = function () {
         var bmu = self.findBestMatchingUnit(item);
 
         // Hit count based classification
-        if (self.classifer === 'hits') {
-          var winningIndex = -1;
-          var match = self.getNeuron(bmu.pos);
-          if (match) {
+        var winningIndex = -1;
+        var match = self.getNeuron(bmu.pos);
+        if (match) {
+          if (self.classifer === 'hits') {
             var hits = match.neuron.hits;
             winningIndex = self.maxIndex(hits);
+          } else {
+            // SOMDI based calculation of winning neuron
+            var winningIndex = self.maxIndex(match.neuron.somdi);
           }
-        } else {
-          // SOMDI based calculation of winning neuron
-          var winningIndex = self.maxIndex(somdi);
         }
 
         results.push(winningIndex);
@@ -352,7 +356,7 @@ var Kohonen = function () {
   }, {
     key: 'maxIndex',
     value: function maxIndex(vector) {
-      return vecotr.indexOf(_fp2.default.max(vector));
+      return vector.indexOf(_fp2.default.max(vector));
     }
 
     // pick a random vector among data
