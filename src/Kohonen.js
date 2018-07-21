@@ -2,6 +2,7 @@ import { scaleLinear } from 'd3-scale';
 import { extent, mean, deviation } from 'd3-array';
 import _ from 'lodash/fp';
 import { dist, mult, diff, add, normalize } from './vector';
+const math = require('mathjs')
 
 // lodash/fp random has a fixed arity of 2, without the last (and useful) param
 const random = _.random.convert({ fixed: false });
@@ -122,6 +123,22 @@ class Kohonen {
     });
 
     return out;
+  }
+
+  // seed a neuron at a set index using the average of the associated class label
+  averageSeed(index, dataLabel) {
+    var vectors = [];
+    this._data.labels.filter(function(label, index) {
+      if (label === dataLabel) {
+        vectors.push(this._data.v[index]);
+      }
+    });
+
+    if (vectors.length > 0) {
+      var meanVector = math.mean(vectors);
+      console.log(meanVector.length);
+      this.neurons[index].somdi = meanVector;
+    }
   }
 
   normalize(data) {

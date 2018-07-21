@@ -20,6 +20,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var math = require('mathjs');
+
 // lodash/fp random has a fixed arity of 2, without the last (and useful) param
 var random = _fp2.default.random.convert({ fixed: false });
 
@@ -144,6 +146,25 @@ var Kohonen = function () {
       });
 
       return out;
+    }
+
+    // seed a neuron at a set index using the average of the associated class label
+
+  }, {
+    key: 'averageSeed',
+    value: function averageSeed(index, dataLabel) {
+      var vectors = [];
+      this._data.labels.filter(function (label, index) {
+        if (label === dataLabel) {
+          vectors.push(this._data.v[index]);
+        }
+      });
+
+      if (vectors.length > 0) {
+        var meanVector = math.mean(vectors);
+        console.log(meanVector.length);
+        this.neurons[index].somdi = meanVector;
+      }
     }
   }, {
     key: 'normalize',
