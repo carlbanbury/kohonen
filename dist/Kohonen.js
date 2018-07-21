@@ -215,12 +215,12 @@ var Kohonen = function () {
         var bmu = this.findBestMatchingUnit(sample).pos;
 
         // increment the hit count of the BMU with the associated class
-        var match = this.getNeuron(bmu.pos);
+        var match = this.getNeuron(pos);
         if (match) {
           var current = match.neuron.hits;
           var somdi = this._data.somdi[match.index];
 
-          this.neurons[index].hits = (0, _vector.add)(current, somdi);
+          this.neurons[match.index].hits = (0, _vector.add)(current, somdi);
         }
 
         // update positions of BMU for sample
@@ -239,7 +239,7 @@ var Kohonen = function () {
         return neuron.pos === pos;
       });
 
-      if (!i) {
+      if (i < 0) {
         return null;
       }
 
