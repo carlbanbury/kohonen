@@ -128,9 +128,10 @@ class Kohonen {
   // seed a neuron at a set index using the average of the associated class label
   averageSeed(index, dataLabel) {
     var vectors = [];
+    var self = this;
     this._data.labels.filter(function(label, index) {
       if (label === dataLabel) {
-        vectors.push(this._data.v[index]);
+        vectors.push(self._data.v[index]);
       }
     });
 

@@ -154,9 +154,10 @@ var Kohonen = function () {
     key: 'averageSeed',
     value: function averageSeed(index, dataLabel) {
       var vectors = [];
+      var self = this;
       this._data.labels.filter(function (label, index) {
         if (label === dataLabel) {
-          vectors.push(this._data.v[index]);
+          vectors.push(self._data.v[index]);
         }
       });
 
