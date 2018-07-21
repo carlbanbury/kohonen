@@ -162,9 +162,8 @@ var Kohonen = function () {
       });
 
       if (vectors.length > 0) {
-        var meanVector = math.mean(vectors);
-        console.log(meanVector.length);
-        this.neurons[index].somdi = meanVector;
+        var meanVector = math.mean(vectors, 0);
+        this.neurons[index].weight = meanVector;
       }
     }
   }, {
