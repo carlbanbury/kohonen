@@ -171,19 +171,44 @@ class Kohonen {
   }
 
   mapping() {
-    // TODO: can do hit count in mapping
-    // TODO: can also output class
     var positions = [];
     for (var i=0; i<this._data.v.length; i++) {
+      var sample = this._data.v[i];
+      var bmu = this.findBestMatchingUnit(sample).pos;
+      
+      // increment the hit count of the BMU with the associated class
+      var match = this.getNeuron(bmu.pos);
+      if (match) {
+        var current = match.neuron.hits;
+        var somdi = this._data.somdi[match.index];
+
+        this.neurons[index].hits = add(current, somdi);
+      }
+
+      // update positions of BMU for sample
       positions.push(this.findBestMatchingUnit(i).pos);
     }
 
     return positions;
   }
 
+  // get the neuron and it's index for a given [x, y] position
+  getNeuron(pos) {
+    var i = this.neurons.findIndex(function(neuron) {
+      return neuron.pos === pos;
+    });
+
+    if (!i) {
+      return null;
+    }
+
+    return {neuron: this.neurons[i], index: i};
+  }
+
   // expects an array of test samples and array of labels with corresponding indexes
   // e.g. testData = [[1, 0, 0], [0, 0, 1], [0, 1, 0]]; testLabels = [1, 0, 2]
-  predict(testData, testLabels) {
+  // if hits is true, use hit count for classification, else use SOMDI
+  predict(testData, testLabels, hits) {
     var self = this;
 
     // normalise the test data if norm enabled
@@ -195,9 +220,20 @@ class Kohonen {
     testData.forEach(function(item, index) {
        var bmu = self.findBestMatchingUnit(item);
 
-       // SOMDI based calculation of winning neuron
-       var somdi = bmu.somdi;
-       var winningIndex = somdi.indexOf(_.max(somdi));
+       // Hit count based classification
+       if (hits) {
+        var winningIndex = -1;
+        var match = self.getNeuron(bmu.pos);
+        if (match) {
+          var hits = match.neuron.hits;
+          winningIndex = hits.indexOf(_.max(hits));
+        }
+       } else {
+        // SOMDI based calculation of winning neuron
+        var somdi = bmu.somdi;
+        var winningIndex = somdi.indexOf(_.max(somdi));
+       }
+       
        results.push(winningIndex);
     });
 
@@ -228,6 +264,7 @@ class Kohonen {
       output.push({
         weight: Array(vectorLength).fill(0).map(()=>Math.random()),
         somdi: somdi,
+        hits: Array(vectorLength).fill(0)
       });
     }
 
@@ -236,8 +273,6 @@ class Kohonen {
 
   // Find closer neuron
   findBestMatchingUnit(target) {
-    var _neurons = _.cloneDeep(this.neurons);
-
     return _.flow(
       _.orderBy(
         n => dist(target, n.weight),
