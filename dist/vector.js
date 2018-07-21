@@ -51,6 +51,10 @@ var normalize = exports.normalize = function normalize(v) {
   var min = _fp2.default.min(v);
   var range = max - min;
   return v.map(function (x) {
+    // gracefully handle divide by zero
+    if (range === 0) {
+      return 0;
+    }
     return (x - min) / range;
   });
 };
