@@ -41,7 +41,8 @@ class Kohonen {
     maxLearningCoef = .4,
     minNeighborhood = .3,
     maxNeighborhood = 1,
-    norm = true
+    norm = true,
+    classifer = 'somdi'  // alternative is 'hits'
   }) {
 
     // data vectors should have at least one dimension
@@ -163,6 +164,62 @@ class Kohonen {
     }
   }
 
+  // LVQ optimisation
+  LVQ(log) {
+    var self = this;
+    for (var i=0; i<this.maxStep; i++) {
+      // pick index for random sample
+      var sampleIndex = self.pickDataIndex();
+      var sample = self._data.v[sampleIndex];
+      var label = self._data.labels[sampleIndex];
+
+      // find bmu
+      const bmu = self.findBestMatchingUnit(sample);
+
+      // grab the bmu neuron
+      const match = self.getNeuron(bmu.pos);
+
+      if (match) {
+        // find out what class we think this neuron is
+        var criteria = self.maxIndex(match.neuron.somdi);
+        if (self.classifer === hits) {
+          criteria = self.maxIndex(match.neuron.hits);
+        }
+
+        // update the weight of the neuron
+        self.neurons[match.index].weight = self.lvqUpdate(match.neuron.weight, sample, label, criteria);
+
+        if (self.classifer === 'somdi') {
+          // also update SOMDI weights
+          var sampleSMDI = self._data.somdi[sampleIndex];
+          self.neurons[match.index].somdi = self.updateStep(match.neuron.somdi, sampleSOMDI, label, criteria);
+        }
+      }
+
+      self.step += 1;
+      log(self.neurons, self.step);
+    }
+  }
+
+  lvqUpdate(weight, sample, label, criteria) {
+    var scaleFactor = this.scaleStepLearningCoef(this.step);
+
+    var converge = false;
+
+    if (criteria === label) {
+      converge = true;
+    }
+
+    var error = diff(neuron.weight, sample);
+    const delta = mult(error, scaleFactor);
+
+    if (converge) {
+      return add(weight, delta);
+    } else {
+      return diff(delta, weight)
+    }
+  }
+
   updateStep(weight, sample, scaleFactor) {
     // compute delta for the current neuron
     var error = diff(weight, sample);
@@ -208,8 +265,8 @@ class Kohonen {
   // expects an array of test samples and array of labels with corresponding indexes
   // e.g. testData = [[1, 0, 0], [0, 0, 1], [0, 1, 0]]; testLabels = [1, 0, 2]
   // if hits is true, use hit count for classification, else use SOMDI
-  predict(testData, testLabels, hits) {
-    var self = this;
+  predict(testData, testLabels) {
+    var self = this; 
 
     // normalise the test data if norm enabled
     if (this.norm) {
@@ -221,17 +278,16 @@ class Kohonen {
        var bmu = self.findBestMatchingUnit(item);
 
        // Hit count based classification
-       if (hits) {
+       if (self.classifer === 'hits') {
         var winningIndex = -1;
         var match = self.getNeuron(bmu.pos);
         if (match) {
           var hits = match.neuron.hits;
-          winningIndex = hits.indexOf(_.max(hits));
+          winningIndex = self.maxIndex(hits);
         }
        } else {
         // SOMDI based calculation of winning neuron
-        var somdi = bmu.somdi;
-        var winningIndex = somdi.indexOf(_.max(somdi));
+        var winningIndex = self.maxIndex(somdi);
        }
        
        results.push(winningIndex);
@@ -242,6 +298,10 @@ class Kohonen {
 
   weights() {
     return this.neurons;
+  }
+
+  maxIndex(vector) {
+    return  vecotr.indexOf(_.max(vector))
   }
 
   // pick a random vector among data

@@ -65,7 +65,9 @@ var Kohonen = function () {
         _ref$maxNeighborhood = _ref.maxNeighborhood,
         maxNeighborhood = _ref$maxNeighborhood === undefined ? 1 : _ref$maxNeighborhood,
         _ref$norm = _ref.norm,
-        norm = _ref$norm === undefined ? true : _ref$norm;
+        norm = _ref$norm === undefined ? true : _ref$norm,
+        _ref$classifer = _ref.classifer,
+        classifer = _ref$classifer === undefined ? 'somdi' : _ref$classifer;
 
     _classCallCheck(this, Kohonen);
 
@@ -198,6 +200,66 @@ var Kohonen = function () {
         _loop();
       }
     }
+
+    // LVQ optimisation
+
+  }, {
+    key: 'LVQ',
+    value: function LVQ(log) {
+      var self = this;
+      for (var i = 0; i < this.maxStep; i++) {
+        // pick index for random sample
+        var sampleIndex = self.pickDataIndex();
+        var sample = self._data.v[sampleIndex];
+        var label = self._data.labels[sampleIndex];
+
+        // find bmu
+        var _bmu = self.findBestMatchingUnit(sample);
+
+        // grab the bmu neuron
+        var match = self.getNeuron(_bmu.pos);
+
+        if (match) {
+          // find out what class we think this neuron is
+          var criteria = self.maxIndex(match.neuron.somdi);
+          if (self.classifer === hits) {
+            criteria = self.maxIndex(match.neuron.hits);
+          }
+
+          // update the weight of the neuron
+          self.neurons[match.index].weight = self.lvqUpdate(match.neuron.weight, sample, label, criteria);
+
+          if (self.classifer === 'somdi') {
+            // also update SOMDI weights
+            var sampleSMDI = self._data.somdi[sampleIndex];
+            self.neurons[match.index].somdi = self.updateStep(match.neuron.somdi, sampleSOMDI, label, criteria);
+          }
+        }
+
+        self.step += 1;
+        log(self.neurons, self.step);
+      }
+    }
+  }, {
+    key: 'lvqUpdate',
+    value: function lvqUpdate(weight, sample, label, criteria) {
+      var scaleFactor = this.scaleStepLearningCoef(this.step);
+
+      var converge = false;
+
+      if (criteria === label) {
+        converge = true;
+      }
+
+      var error = (0, _vector.diff)(neuron.weight, sample);
+      var delta = (0, _vector.mult)(error, scaleFactor);
+
+      if (converge) {
+        return (0, _vector.add)(weight, delta);
+      } else {
+        return (0, _vector.diff)(delta, weight);
+      }
+    }
   }, {
     key: 'updateStep',
     value: function updateStep(weight, sample, scaleFactor) {
@@ -252,7 +314,7 @@ var Kohonen = function () {
 
   }, {
     key: 'predict',
-    value: function predict(testData, testLabels, hits) {
+    value: function predict(testData, testLabels) {
       var self = this;
 
       // normalise the test data if norm enabled
@@ -265,17 +327,16 @@ var Kohonen = function () {
         var bmu = self.findBestMatchingUnit(item);
 
         // Hit count based classification
-        if (hits) {
+        if (self.classifer === 'hits') {
           var winningIndex = -1;
           var match = self.getNeuron(bmu.pos);
           if (match) {
             var hits = match.neuron.hits;
-            winningIndex = hits.indexOf(_fp2.default.max(hits));
+            winningIndex = self.maxIndex(hits);
           }
         } else {
           // SOMDI based calculation of winning neuron
-          var somdi = bmu.somdi;
-          var winningIndex = somdi.indexOf(_fp2.default.max(somdi));
+          var winningIndex = self.maxIndex(somdi);
         }
 
         results.push(winningIndex);
@@ -287,6 +348,11 @@ var Kohonen = function () {
     key: 'weights',
     value: function weights() {
       return this.neurons;
+    }
+  }, {
+    key: 'maxIndex',
+    value: function maxIndex(vector) {
+      return vecotr.indexOf(_fp2.default.max(vector));
     }
 
     // pick a random vector among data
