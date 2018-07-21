@@ -169,6 +169,8 @@ class Kohonen {
   // LVQ optimisation
   LVQ(log) {
     var self = this;
+    // reset number of steps
+    self.step = 0;
     for (var i=0; i<this.maxStep; i++) {
       // pick index for random sample
       var sampleIndex = self.pickDataIndex();
