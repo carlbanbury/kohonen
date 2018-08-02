@@ -2,6 +2,7 @@ import { scaleLinear } from 'd3-scale';
 import { extent, mean, deviation } from 'd3-array';
 import _ from 'lodash/fp';
 import { dist, mult, diff, add, normalize } from './vector';
+const math = require('mathjs')
 
 // lodash/fp random has a fixed arity of 2, without the last (and useful) param
 const random = _.random.convert({ fixed: false });
@@ -124,6 +125,22 @@ class Kohonen {
     return out;
   }
 
+  // seed a neuron at a set index using the average of the associated class label
+  averageSeed(index, dataLabel) {
+    var vectors = [];
+    var self = this;
+    this._data.labels.filter(function(label, index) {
+      if (label === dataLabel) {
+        vectors.push(self._data.v[index]);
+      }
+    });
+
+    if (vectors.length > 0) {
+      var meanVector = math.mean(vectors, 0);
+      this.neurons[index].weight = meanVector;
+    }
+  }
+
   normalize(data) {
     // TODO: Scale this properly between 0 and 1
     data.forEach(function(item, index) {
@@ -197,6 +214,65 @@ class Kohonen {
           // also update SOMDI weights
           var sampleSMDI = self._data.somdi[sampleIndex];
           self.neurons[match.index].somdi = self.updateStep(match.neuron.somdi, sampleSOMDI, label, criteria);
+        }
+      }
+
+      self.step += 1;
+      if (log) {
+        log(self.neurons, self.step);
+      }
+    }
+  }
+
+  // TODO: handle critera for sample to be sufficiently close to BMU1 and BMU2
+  LVQ2(log) {
+    var self = this;
+    // reset number of steps
+    self.step = 0;
+    for (var i=0; i<this.maxStep; i++) {
+      // pick index for random sample
+      var sampleIndex = self.pickDataIndex();
+      var sample = self._data.v[sampleIndex];
+      var label = self._data.labels[sampleIndex];
+
+      // find bmu
+      const bmu = self.findBestMatchingUnit(sample);
+
+      // grab the bmu neuron
+      const original = self.getNeuron(bmu.pos);
+
+      if (original) {
+        // find out what class we think this neuron is
+        var criteria = self.maxIndex(original.neuron.somdi);
+        if (self.classifer === 'hits') {
+          criteria = self.maxIndex(original.neuron.hits);
+        }
+
+        // TODO: tidy this up with a recursive function
+        if (criteria !== label) {
+          const bmu2 = self.findBestMatchingUnit(sample, 1);
+          const nextBest = self.getNeuron(bmu2.pos);
+
+          var newCriteria = self.maxIndex(nextBest.neuron.somdi);
+          if (self.classifer === 'hits') {
+            newCriteria = self.maxIndex(nextBest.neuron.hits);
+          }
+
+          // check if bmu2  is a better match
+          if (newCriteria === label) {
+            // make bmu2 more like sample
+            self.neurons[nextBest.index].weight = self.lvqUpdate(nextBest.neuron.weight, sample, 0, 0);
+
+            // make existing bmu less like sample
+            self.neurons[original.index].weight = self.lvqUpdate(original.neuron.weight, sample, 0, 1);
+
+            // also update SOMDI weights
+            if (self.classifer === 'somdi') {
+              var sampleSMDI = self._data.somdi[sampleIndex];
+              self.neurons[nextBest.index].somdi = self.updateStep(nextBest.neuron.somdi, sampleSOMDI, 0, 0);
+              self.neurons[original.index].somdi = self.updateStep(original.neuron.somdi, sampleSOMDI, 0, 1);
+            }
+          }
         }
       }
 
@@ -338,13 +414,19 @@ class Kohonen {
   }
 
   // Find closer neuron
-  findBestMatchingUnit(target) {
+  findBestMatchingUnit(target, n) {
+    var index = 0;
+
+    // allow to check the next best match for LVQ2
+    if (n) {
+      index = n;
+    }
     return _.flow(
       _.orderBy(
         n => dist(target, n.weight),
         'asc',
       ),
-      _.first
+      _.nth(index)
     )(this.neurons);
   }
 

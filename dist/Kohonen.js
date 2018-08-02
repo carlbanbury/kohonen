@@ -20,6 +20,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var math = require('mathjs');
+
 // lodash/fp random has a fixed arity of 2, without the last (and useful) param
 var random = _fp2.default.random.convert({ fixed: false });
 
@@ -145,6 +147,25 @@ var Kohonen = function () {
 
       return out;
     }
+
+    // seed a neuron at a set index using the average of the associated class label
+
+  }, {
+    key: 'averageSeed',
+    value: function averageSeed(index, dataLabel) {
+      var vectors = [];
+      var self = this;
+      this._data.labels.filter(function (label, index) {
+        if (label === dataLabel) {
+          vectors.push(self._data.v[index]);
+        }
+      });
+
+      if (vectors.length > 0) {
+        var meanVector = math.mean(vectors, 0);
+        this.neurons[index].weight = meanVector;
+      }
+    }
   }, {
     key: 'normalize',
     value: function normalize(data) {
@@ -237,6 +258,68 @@ var Kohonen = function () {
             // also update SOMDI weights
             var sampleSMDI = self._data.somdi[sampleIndex];
             self.neurons[match.index].somdi = self.updateStep(match.neuron.somdi, sampleSOMDI, label, criteria);
+          }
+        }
+
+        self.step += 1;
+        if (log) {
+          log(self.neurons, self.step);
+        }
+      }
+    }
+
+    // TODO: handle critera for sample to be sufficiently close to BMU1 and BMU2
+
+  }, {
+    key: 'LVQ2',
+    value: function LVQ2(log) {
+      var self = this;
+      // reset number of steps
+      self.step = 0;
+      for (var i = 0; i < this.maxStep; i++) {
+        // pick index for random sample
+        var sampleIndex = self.pickDataIndex();
+        var sample = self._data.v[sampleIndex];
+        var label = self._data.labels[sampleIndex];
+
+        // find bmu
+        var _bmu2 = self.findBestMatchingUnit(sample);
+
+        // grab the bmu neuron
+        var original = self.getNeuron(_bmu2.pos);
+
+        if (original) {
+          // find out what class we think this neuron is
+          var criteria = self.maxIndex(original.neuron.somdi);
+          if (self.classifer === 'hits') {
+            criteria = self.maxIndex(original.neuron.hits);
+          }
+
+          // TODO: tidy this up with a recursive function
+          if (criteria !== label) {
+            var bmu2 = self.findBestMatchingUnit(sample, 1);
+            var nextBest = self.getNeuron(bmu2.pos);
+
+            var newCriteria = self.maxIndex(nextBest.neuron.somdi);
+            if (self.classifer === 'hits') {
+              newCriteria = self.maxIndex(nextBest.neuron.hits);
+            }
+
+            // check if bmu2  is a better match
+            if (newCriteria === label) {
+              // make bmu2 more like sample
+              self.neurons[nextBest.index].weight = self.lvqUpdate(nextBest.neuron.weight, sample, 0, 0);
+
+              // make existing bmu less like sample
+              self.neurons[original.index].weight = self.lvqUpdate(original.neuron.weight, sample, 0, 1);
+
+              // also update SOMDI weights
+              if (self.classifer === 'somdi') {
+                var sampleSMDI = self._data.somdi[sampleIndex];
+                self.neurons[nextBest.index].somdi = self.updateStep(nextBest.neuron.somdi, sampleSOMDI, 0, 0);
+                self.neurons[original.index].somdi = self.updateStep(original.neuron.somdi, sampleSOMDI, 0, 1);
+              }
+            }
           }
         }
 
@@ -400,10 +483,16 @@ var Kohonen = function () {
 
   }, {
     key: 'findBestMatchingUnit',
-    value: function findBestMatchingUnit(target) {
+    value: function findBestMatchingUnit(target, n) {
+      var index = 0;
+
+      // allow to check the next best match for LVQ2
+      if (n) {
+        index = n;
+      }
       return _fp2.default.flow(_fp2.default.orderBy(function (n) {
         return (0, _vector.dist)(target, n.weight);
-      }, 'asc'), _fp2.default.first)(this.neurons);
+      }, 'asc'), _fp2.default.nth(index))(this.neurons);
     }
 
     // http://en.wikipedia.org/wiki/Gaussian_function#Two-dimensional_Gaussian_function
