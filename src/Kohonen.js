@@ -1,7 +1,7 @@
 import { scaleLinear } from 'd3-scale';
 import { extent, mean, deviation } from 'd3-array';
 import _ from 'lodash/fp';
-import { dist, mult, diff, add, normalize } from './vector';
+import { dist, mult, diff, add, normalize, dotProduct } from './vector';
 const math = require('mathjs')
 
 // lodash/fp random has a fixed arity of 2, without the last (and useful) param
@@ -43,7 +43,8 @@ class Kohonen {
     minNeighborhood = .3,
     maxNeighborhood = 1,
     norm = true,
-    classifer = 'somdi'  // alternative is 'hits'
+    classifer = 'somdi',  // alternative is 'hits',
+    distance // alternative = 'corr'
   }) {
 
     // data vectors should have at least one dimension
@@ -71,7 +72,8 @@ class Kohonen {
     this.numNeurons = neurons.length;
     this.step = 0;
     this.maxStep = maxStep;
-    this.norm = norm
+    this.norm = norm;
+    this.distance = distance;
 
     // generate scaleStepLearningCoef,
     // as the learning coef decreases with time
@@ -421,6 +423,17 @@ class Kohonen {
     if (n) {
       index = n;
     }
+
+    if (this.distance === 'corr') {
+      return _.flow(
+        _.orderBy(
+          n => dotProduct(target, n.weight),
+          'asc',
+        ),
+        _.nth(index)
+      )(this.neurons);
+    }
+
     return _.flow(
       _.orderBy(
         n => dist(target, n.weight),

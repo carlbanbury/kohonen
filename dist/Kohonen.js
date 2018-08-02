@@ -69,7 +69,8 @@ var Kohonen = function () {
         _ref$norm = _ref.norm,
         norm = _ref$norm === undefined ? true : _ref$norm,
         _ref$classifer = _ref.classifer,
-        classifer = _ref$classifer === undefined ? 'somdi' : _ref$classifer;
+        classifer = _ref$classifer === undefined ? 'somdi' : _ref$classifer,
+        distance = _ref.distance;
 
     _classCallCheck(this, Kohonen);
 
@@ -97,6 +98,7 @@ var Kohonen = function () {
     this.step = 0;
     this.maxStep = maxStep;
     this.norm = norm;
+    this.distance = distance;
 
     // generate scaleStepLearningCoef,
     // as the learning coef decreases with time
@@ -490,6 +492,13 @@ var Kohonen = function () {
       if (n) {
         index = n;
       }
+
+      if (this.distance === 'corr') {
+        return _fp2.default.flow(_fp2.default.orderBy(function (n) {
+          return (0, _vector.dotProduct)(target, n.weight);
+        }, 'asc'), _fp2.default.nth(index))(this.neurons);
+      }
+
       return _fp2.default.flow(_fp2.default.orderBy(function (n) {
         return (0, _vector.dist)(target, n.weight);
       }, 'asc'), _fp2.default.nth(index))(this.neurons);
