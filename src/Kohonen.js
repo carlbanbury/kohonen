@@ -102,6 +102,7 @@ class Kohonen {
     this.neurons = neurons.map(function(neuron, index) {
       var item = randomInitialVectors[index];
       item.pos = neuron.pos;
+      item.score = 0; // use this to rate the performance of each neuron
       return item;
     });
   }
@@ -346,6 +347,51 @@ class Kohonen {
     return {neuron: this.neurons[i], index: i};
   }
 
+  setNeuronScore(pos, change) {
+    var i = this.neurons.findIndex(function(neuron) {
+      return neuron.pos === pos;
+    });
+
+    if (i < 0) {
+      return null;
+    }
+
+    this.neurons[i].score += change;
+  }
+
+  // generate somdi index for classIndex defined as input.
+  // type used to identify neurons that work well for classification
+  SOMDI(classIndex, type) {
+    var self = this;
+
+    // find neurons with max somdi score associated with classIndex
+    var classNeurons = this.neurons.filter(function(neuron) {
+      var maxIndex = self.maxIndex(neuron.somdi);
+      neuron.sWeight = neuron.somdi[maxIndex];
+      
+      if (type) {
+        if (type === 'positive') {
+          return maxIndex === classIndex && neuron.score > 0;
+        }
+
+        if (type === 'negative') {
+          return maxIndex === classIndex && neuron.score < 0;
+        }
+      }
+
+      return maxIndex === classIndex;
+    });
+
+    // multiply weight by somdiWeight & sum over all neurons
+    var somdi = new Array(this.neurons[0].weight.length).fill(0);;
+    classNeurons.forEach(function(neuron) {
+      var current = multi(neuron.weight, neuron.sWeight);
+      somdi = add(somdi, current);
+    });
+
+    return somdi;
+  }
+
   // expects an array of test samples and array of labels with corresponding indexes
   // e.g. testData = [[1, 0, 0], [0, 0, 1], [0, 1, 0]]; testLabels = [1, 0, 2]
   // if hits is true, use hit count for classification, else use SOMDI
@@ -372,6 +418,13 @@ class Kohonen {
           // SOMDI based calculation of winning neuron
           var winningIndex = self.maxIndex(match.neuron.somdi);
         }
+      }
+
+      // keep score of neurons
+      if (testLabels[index] !== winningIndex) {
+        self.setNeuronScore(bmu.pos, -1);
+      } else {
+        self.setNeuronScore(bmu.pos, 1);
       }
 
       results.push(winningIndex);
