@@ -442,7 +442,7 @@ var Kohonen = function () {
       // multiply weight by somdiWeight & sum over all neurons
       var somdi = new Array(this.neurons[0].weight.length).fill(0);;
       classNeurons.forEach(function (neuron) {
-        var current = multi(neuron.weight, neuron.sWeight);
+        var current = (0, _vector.mult)(neuron.weight, neuron.sWeight);
         somdi = (0, _vector.add)(somdi, current);
       });
 
