@@ -93,7 +93,7 @@ class Kohonen {
     // normalize data
     if (this.norm) {
       this._data.v = this.normalize(this._data.v);
-    } 
+    }
 
     // On each neuron, generate a random vector v
     // of <size> dimension
@@ -317,7 +317,7 @@ class Kohonen {
     for (var i=0; i<this._data.v.length; i++) {
       var sample = this._data.v[i];
       var bmu = this.findBestMatchingUnit(sample);
-      
+
       // increment the hit count of the BMU with the associated class
       var match = this.getNeuron(bmu.pos);
       if (match) {
@@ -368,7 +368,7 @@ class Kohonen {
     var classNeurons = this.neurons.filter(function(neuron) {
       var maxIndex = self.maxIndex(neuron.somdi);
       neuron.sWeight = neuron.somdi[maxIndex];
-      
+
       if (type) {
         if (type === 'positive') {
           return maxIndex === classIndex && neuron.score > 0;
@@ -385,7 +385,7 @@ class Kohonen {
     // multiply weight by somdiWeight & sum over all neurons
     var somdi = new Array(this.neurons[0].weight.length).fill(0);;
     classNeurons.forEach(function(neuron) {
-      var current = multi(neuron.weight, neuron.sWeight);
+      var current = mult(neuron.weight, neuron.sWeight);
       somdi = add(somdi, current);
     });
 
@@ -396,7 +396,7 @@ class Kohonen {
   // e.g. testData = [[1, 0, 0], [0, 0, 1], [0, 1, 0]]; testLabels = [1, 0, 2]
   // if hits is true, use hit count for classification, else use SOMDI
   predict(testData, testLabels) {
-    var self = this; 
+    var self = this;
 
     // normalise the test data if norm enabled
     if (this.norm) {
@@ -457,7 +457,7 @@ class Kohonen {
         var somdiLength = this._data.somdi[0].length;
         var somdi = Array(somdiLength).fill(0).map(()=>Math.random());
       }
-      
+
       output.push({
         weight: Array(vectorLength).fill(0).map(()=>Math.random()),
         somdi: somdi,
@@ -546,7 +546,7 @@ class Kohonen {
   //     classMap.push([bmu.pos, classLabels]);
   //     positions.push(bmu.pos);
   //   });
-    
+
   //   // loop through all positions
   //   positions.forEach(function(position) {
   //     // filter and sum class indexes to get hit count
@@ -583,7 +583,7 @@ class Kohonen {
   //       testData = n.normalize(testData, 'max');
   //       test = testData.concat(classData);
   //   }
-    
+
 
   //   if (!this.hitCount) {
   //     return null;
