@@ -440,11 +440,11 @@ var Kohonen = function () {
 
         if (type) {
           if (type === 'positive') {
-            return maxIndex === classIndex && neuron.score.correct > 0;
+            return maxIndex === classIndex && neuron.score.correct > 0 && neuron.sWeight > _threshold;
           }
 
           if (type === 'negative') {
-            return maxIndex === classIndex && neuron.score.incorrect > 0;
+            return maxIndex === classIndex && neuron.score.incorrect > 0 && neuron.sWeight > _threshold;
           }
         }
 
