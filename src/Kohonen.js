@@ -383,7 +383,7 @@ class Kohonen {
         }
       }
 
-      return maxIndex === classIndex && neuron.sWeight > threshold;
+      return maxIndex === classIndex && neuron.sWeight > _threshold;
     });
 
     // multiply weight by somdiWeight & sum over all neurons
