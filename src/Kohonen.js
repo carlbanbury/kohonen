@@ -102,7 +102,11 @@ class Kohonen {
     this.neurons = neurons.map(function(neuron, index) {
       var item = randomInitialVectors[index];
       item.pos = neuron.pos;
-      item.score = 0; // use this to rate the performance of each neuron
+      item.score = {  // use this to rate the performance of each neuron
+        correct: 0,
+        incorrect: 0
+      }
+
       return item;
     });
   }
@@ -347,7 +351,7 @@ class Kohonen {
     return {neuron: this.neurons[i], index: i};
   }
 
-  setNeuronScore(pos, change) {
+  setNeuronScore(pos, correct) {
     var i = this.neurons.findIndex(function(neuron) {
       return neuron.pos === pos;
     });
@@ -356,7 +360,11 @@ class Kohonen {
       return null;
     }
 
-    this.neurons[i].score += change;
+    if (correct) {
+      this.neurons[i].score.correct += 1;
+    } else {
+      this.neurons[i].score.incorrect += 1;
+    }
   }
 
   // generate somdi index for classIndex defined as input.
@@ -375,11 +383,11 @@ class Kohonen {
 
       if (type) {
         if (type === 'positive') {
-          return maxIndex === classIndex && neuron.score > 0;
+          return maxIndex === classIndex && neuron.score.correct > 0;
         }
 
         if (type === 'negative') {
-          return maxIndex === classIndex && neuron.score < 0;
+          return maxIndex === classIndex && neuron.score.incorrect > 0;
         }
       }
 
@@ -402,7 +410,7 @@ class Kohonen {
   // expects an array of test samples and array of labels with corresponding indexes
   // e.g. testData = [[1, 0, 0], [0, 0, 1], [0, 1, 0]]; testLabels = [1, 0, 2]
   // if hits is true, use hit count for classification, else use SOMDI
-  predict(testData, testLabels) {
+  predict(testData, testLabels, measureIndex) {
     var self = this;
 
     // normalise the test data if norm enabled
@@ -427,11 +435,14 @@ class Kohonen {
         }
       }
 
-      // keep score of neurons
-      if (testLabels[index] !== winningIndex) {
-        self.setNeuronScore(bmu.pos, -1);
-      } else {
-        self.setNeuronScore(bmu.pos, 1);
+      // only record class type we want to measure
+      if (winningIndex === measureIndex) {
+        // keep score of neurons
+        if (testLabels[index] !== winningIndex) {
+          self.setNeuronScore(bmu.pos, -1);
+        } else {
+          self.setNeuronScore(bmu.pos, 1);
+        }
       }
 
       results.push(winningIndex);
