@@ -499,9 +499,9 @@ var Kohonen = function () {
         if (winningIndex === measureIndex) {
           // keep score of neurons
           if (testLabels[index] !== winningIndex) {
-            self.setNeuronScore(bmu.pos, -1);
+            self.setNeuronScore(bmu.pos, false);
           } else {
-            self.setNeuronScore(bmu.pos, 1);
+            self.setNeuronScore(bmu.pos, true);
           }
         }
 
