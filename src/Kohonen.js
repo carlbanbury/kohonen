@@ -1,7 +1,7 @@
 import { scaleLinear } from 'd3-scale';
 import { extent, mean, deviation } from 'd3-array';
 import _ from 'lodash/fp';
-import { dist, mult, diff, add, normalize, dotProduct } from './vector';
+import { dist, mult, diff, add, normalize, dotProduct, divide } from './vector';
 const math = require('mathjs')
 
 // lodash/fp random has a fixed arity of 2, without the last (and useful) param
@@ -361,7 +361,11 @@ class Kohonen {
 
   // generate somdi index for classIndex defined as input.
   // type used to identify neurons that work well for classification
-  SOMDI(classIndex, type) {
+  SOMDI(classIndex, type, threshold) {
+    var _threshold = 0;
+    if (threshold) {
+      _threshold = threshold;
+    }
     var self = this;
 
     // find neurons with max somdi score associated with classIndex
@@ -379,7 +383,7 @@ class Kohonen {
         }
       }
 
-      return maxIndex === classIndex;
+      return maxIndex === classIndex && neuron.sWeight > threshold;
     });
 
     // multiply weight by somdiWeight & sum over all neurons
@@ -388,6 +392,9 @@ class Kohonen {
       var current = mult(neuron.weight, neuron.sWeight);
       somdi = add(somdi, current);
     });
+
+    // divide by the number of activated neurons
+    somdi = divide(somdi, classNeurons.length);
 
     return somdi;
   }

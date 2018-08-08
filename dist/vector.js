@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.random = exports.normalize = exports.add = exports.diff = exports.mult = exports.dotProduct = exports.dist = undefined;
+exports.random = exports.normalize = exports.add = exports.diff = exports.divide = exports.mult = exports.dotProduct = exports.dist = undefined;
 
 var _fp = require('lodash/fp');
 
@@ -37,6 +37,13 @@ var dotProduct = exports.dotProduct = function dotProduct(v1, v2) {
 var mult = exports.mult = function mult(v, coef) {
   return v.map(function (val) {
     return val * coef;
+  });
+};
+
+// scaler division
+var divide = exports.divide = function divide(v, coef) {
+  return v.map(function (val) {
+    return val / coef;
   });
 };
 

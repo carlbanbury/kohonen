@@ -418,7 +418,11 @@ var Kohonen = function () {
 
   }, {
     key: 'SOMDI',
-    value: function SOMDI(classIndex, type) {
+    value: function SOMDI(classIndex, type, threshold) {
+      var _threshold = 0;
+      if (threshold) {
+        _threshold = threshold;
+      }
       var self = this;
 
       // find neurons with max somdi score associated with classIndex
@@ -436,7 +440,7 @@ var Kohonen = function () {
           }
         }
 
-        return maxIndex === classIndex;
+        return maxIndex === classIndex && neuron.sWeight > threshold;
       });
 
       // multiply weight by somdiWeight & sum over all neurons
@@ -445,6 +449,9 @@ var Kohonen = function () {
         var current = (0, _vector.mult)(neuron.weight, neuron.sWeight);
         somdi = (0, _vector.add)(somdi, current);
       });
+
+      // divide by the number of activated neurons
+      somdi = (0, _vector.divide)(somdi, classNeurons.length);
 
       return somdi;
     }
