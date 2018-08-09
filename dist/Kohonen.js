@@ -497,7 +497,7 @@ var Kohonen = function () {
 
         // if sample is of type we want to track performance of
         if (testLabels[index] === predictIndex) {
-          if (winningIndex === peredictIndex) {
+          if (winningIndex === predictIndex) {
             self.setNeuronScore(bmu.pos, true);
           } else if (winningIndex === falseIndex) {
             // record neurons that classify incorrectly
