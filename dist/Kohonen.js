@@ -440,11 +440,11 @@ var Kohonen = function () {
 
         if (type) {
           if (type === 'positive') {
-            return maxIndex === classIndex && neuron.score.correct > 0 && neuron.sWeight > _threshold;
+            return maxIndex === classIndex && neuron.score.correct > 0;
           }
 
           if (type === 'negative') {
-            return maxIndex === classIndex && neuron.score.incorrect > 0 && neuron.sWeight > _threshold;
+            return maxIndex === classIndex && neuron.score.incorrect > 0;
           }
         }
 
@@ -470,7 +470,7 @@ var Kohonen = function () {
 
   }, {
     key: 'predict',
-    value: function predict(testData, testLabels, measureIndex) {
+    value: function predict(testData, testLabels, predictIndex, falseIndex) {
       var self = this;
 
       // normalise the test data if norm enabled
@@ -495,13 +495,13 @@ var Kohonen = function () {
           }
         }
 
-        // only record class type we want to measure
-        if (winningIndex === measureIndex) {
-          // keep score of neurons
-          if (testLabels[index] !== winningIndex) {
-            self.setNeuronScore(bmu.pos, false);
-          } else {
+        // if sample is of type we want to track performance of
+        if (testLabels[index] === predictIndex) {
+          if (winningIndex === peredictIndex) {
             self.setNeuronScore(bmu.pos, true);
+          } else if (winningIndex === falseIndex) {
+            // record neurons that classify incorrectly
+            self.setNeuronScore(bmu.pos, false);
           }
         }
 

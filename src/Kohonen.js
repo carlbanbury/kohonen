@@ -383,11 +383,11 @@ class Kohonen {
 
       if (type) {
         if (type === 'positive') {
-          return maxIndex === classIndex && neuron.score.correct > 0 && neuron.sWeight > _threshold;
+          return maxIndex === classIndex && neuron.score.correct > 0;
         }
 
         if (type === 'negative') {
-          return maxIndex === classIndex && neuron.score.incorrect > 0 && neuron.sWeight > _threshold;
+          return maxIndex === classIndex && neuron.score.incorrect > 0;
         }
       }
 
@@ -410,7 +410,7 @@ class Kohonen {
   // expects an array of test samples and array of labels with corresponding indexes
   // e.g. testData = [[1, 0, 0], [0, 0, 1], [0, 1, 0]]; testLabels = [1, 0, 2]
   // if hits is true, use hit count for classification, else use SOMDI
-  predict(testData, testLabels, measureIndex) {
+  predict(testData, testLabels, predictIndex, falseIndex) {
     var self = this;
 
     // normalise the test data if norm enabled
@@ -435,13 +435,12 @@ class Kohonen {
         }
       }
 
-      // only record class type we want to measure
-      if (winningIndex === measureIndex) {
-        // keep score of neurons
-        if (testLabels[index] !== winningIndex) {
-          self.setNeuronScore(bmu.pos, false);
-        } else {
+      // if sample is of type we want to track performance of
+      if (testLabels[index] === predictIndex) {
+        if (winningIndex === peredictIndex) {
           self.setNeuronScore(bmu.pos, true);
+        } else if (winningIndex === falseIndex) { // record neurons that classify incorrectly
+          self.setNeuronScore(bmu.pos, false);
         }
       }
 
