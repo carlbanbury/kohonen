@@ -383,11 +383,11 @@ class Kohonen {
 
       if (type) {
         if (type === 'positive') {
-          return neuron.score.correct > 0;
+          return neuron.score.correct > 0 && neuron.score.incorrect === 0;
         }
 
         if (type === 'negative') {
-          return neuron.score.incorrect > 0;
+          return neuron.score.incorrect > 0 && neuron.score.correct === 0;
         }
       }
 
