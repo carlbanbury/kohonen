@@ -410,7 +410,7 @@ class Kohonen {
   // get the classes for each neuron. Currently based on somdi
   // TODO: add support for hit count and neuron performance
   neuronClasses(threshold, hits) {
-    _threshold = 0;
+    var _threshold = 0;
     if (threshold) {
       _threshold = threshold;
     }

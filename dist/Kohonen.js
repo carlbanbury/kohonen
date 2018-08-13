@@ -470,7 +470,7 @@ var Kohonen = function () {
   }, {
     key: 'neuronClasses',
     value: function neuronClasses(threshold, hits) {
-      _threshold = 0;
+      var _threshold = 0;
       if (threshold) {
         _threshold = threshold;
       }
