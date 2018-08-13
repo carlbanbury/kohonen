@@ -407,6 +407,18 @@ class Kohonen {
     return somdi;
   }
 
+  // get the classes for each neuron. Currently based on somdi
+  // TODO: add support for hit count and neuron performance
+  neuronClasses() {
+    var self = this;
+    var out = [];
+    this.neurons.forEach(function(neuron) {
+      out.push({pos: neuron.pos, class: self.maxIndex(neuron.somdi)});
+    });
+
+    return out;
+  }
+
   // expects an array of test samples and array of labels with corresponding indexes
   // e.g. testData = [[1, 0, 0], [0, 0, 1], [0, 1, 0]]; testLabels = [1, 0, 2]
   // if hits is true, use hit count for classification, else use SOMDI
