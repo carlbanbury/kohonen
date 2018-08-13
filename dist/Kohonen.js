@@ -469,11 +469,27 @@ var Kohonen = function () {
 
   }, {
     key: 'neuronClasses',
-    value: function neuronClasses() {
+    value: function neuronClasses(threshold, hits) {
+      _threshold = 0;
+      if (threshold) {
+        _threshold = threshold;
+      }
       var self = this;
       var out = [];
+
       this.neurons.forEach(function (neuron) {
-        out.push({ pos: neuron.pos, class: self.maxIndex(neuron.somdi) });
+        var label = null;
+
+        var index = self.maxIndex(neuron.somdi);
+        if (neuron.somdi[index] > threshold) {
+          label = index;
+        }
+
+        if (hits) {
+          label = self.maxIndex(neuron.hits);
+        }
+
+        out.push({ pos: neuron.pos, class: label });
       });
 
       return out;
