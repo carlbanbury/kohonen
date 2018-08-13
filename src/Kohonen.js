@@ -326,7 +326,7 @@ class Kohonen {
       var match = this.getNeuron(bmu.pos);
       if (match) {
         var current = match.neuron.hits;
-        var somdi = this._data.somdi[match.index];
+        var somdi = this._data.somdi[i];
 
         this.neurons[match.index].hits = add(current, somdi);
       }
@@ -497,16 +497,18 @@ class Kohonen {
       var vectorLength = this._data.v[0].length;
 
       var somdi = null;
+      var hits = null;
 
       if (labels) {
         var somdiLength = this._data.somdi[0].length;
         var somdi = Array(somdiLength).fill(0).map(()=>Math.random());
+        hits = Array(vectorLength).fill(0);
       }
 
       output.push({
         weight: Array(vectorLength).fill(0).map(()=>Math.random()),
         somdi: somdi,
-        hits: Array(vectorLength).fill(0)
+        hits: hits
       });
     }
 

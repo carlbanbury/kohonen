@@ -376,7 +376,7 @@ var Kohonen = function () {
         var match = this.getNeuron(bmu.pos);
         if (match) {
           var current = match.neuron.hits;
-          var somdi = this._data.somdi[match.index];
+          var somdi = this._data.somdi[i];
 
           this.neurons[match.index].hits = (0, _vector.add)(current, somdi);
         }
@@ -567,12 +567,14 @@ var Kohonen = function () {
         var vectorLength = this._data.v[0].length;
 
         var somdi = null;
+        var hits = null;
 
         if (labels) {
           var somdiLength = this._data.somdi[0].length;
           var somdi = Array(somdiLength).fill(0).map(function () {
             return Math.random();
           });
+          hits = Array(vectorLength).fill(0);
         }
 
         output.push({
@@ -580,7 +582,7 @@ var Kohonen = function () {
             return Math.random();
           }),
           somdi: somdi,
-          hits: Array(vectorLength).fill(0)
+          hits: hits
         });
       }
 
