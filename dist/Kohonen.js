@@ -305,11 +305,11 @@ var Kohonen = function () {
 
         // get info for bmu
         var _bmu2 = self.findBestMatchingUnit(sample);
-        var a = self.getCandidate(_bmu2.pos, sample);
+        var a = getCandidate(_bmu2.pos, sample);
 
         // grab the next best neuron
         var bmu2 = self.findBestMatchingUnit(sample, 1);
-        var b = self.getCandidate(bmu2.pos, sample);
+        var b = getCandidate(bmu2.pos, sample);
 
         // check sample is close enough to boundary
         var s = (1 - self.window) / (1 + self.window);
