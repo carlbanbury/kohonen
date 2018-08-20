@@ -285,12 +285,12 @@ var Kohonen = function () {
       function getCandidate(pos, sample) {
         var neuron = self.getNeuron(pos);
 
-        var criteria = self.maxIndex(neuron.somdi);
+        var criteria = self.maxIndex(neuron.neuron.somdi);
         if (self.classifer === 'hits') {
-          criteria = self.maxIndex(neuron.hits);
+          criteria = self.maxIndex(neuron.neuron.hits);
         }
 
-        var distance = (0, _vector.dist)(neuron.weight, sample);
+        var distance = (0, _vector.dist)(neuron.neuron.weight, sample);
 
         return { index: neuron.index, label: criteria, distance: distance };
       }
