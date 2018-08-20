@@ -481,7 +481,7 @@ class Kohonen {
       return _.flow(
         _.orderBy(
           n => dotProduct(target, n.weight),
-          'asc',
+          'desc',
         ),
         _.nth(index)
       )(this.neurons);

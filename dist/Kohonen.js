@@ -553,7 +553,7 @@ var Kohonen = function () {
       if (this.distance === 'corr') {
         return _fp2.default.flow(_fp2.default.orderBy(function (n) {
           return (0, _vector.dotProduct)(target, n.weight);
-        }, 'asc'), _fp2.default.nth(index))(this.neurons);
+        }, 'desc'), _fp2.default.nth(index))(this.neurons);
       }
 
       return _fp2.default.flow(_fp2.default.orderBy(function (n) {
