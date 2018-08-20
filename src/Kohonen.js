@@ -259,11 +259,11 @@ class Kohonen {
 
       // get info for bmu
       const bmu = self.findBestMatchingUnit(sample);
-      const a = self.getCandidate(bmu.pos, sample);
+      const a = getCandidate(bmu.pos, sample);
 
       // grab the next best neuron
       const bmu2 = self.findBestMatchingUnit(sample, 1);
-      const b = self.getCandidate(bmu2.pos, sample);
+      const b = getCandidate(bmu2.pos, sample);
 
       // check sample is close enough to boundary
       var s = (1 - self.window) / (1 + self.window);
