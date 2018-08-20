@@ -22,6 +22,9 @@ export const dotProduct = function(v1, v2) {
 // scalar mult of a vector
 export const mult = (v, coef) => v.map(val => val * coef);
 
+// scaler division
+export const divide = (v, coef) => v.map(val => val / coef);
+
 // scalar diff of a vector
 export const diff = (v1, v2) => v1.map((val, i) => v2[i] - val);
 
@@ -39,7 +42,7 @@ export const normalize = function(v) {
             return 0;
         }
 		return (x - min) / range;
-	});	
+	});
 };
 
 // For a given size, return an array of `size` with random values

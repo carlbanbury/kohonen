@@ -121,7 +121,11 @@ var Kohonen = function () {
     this.neurons = neurons.map(function (neuron, index) {
       var item = randomInitialVectors[index];
       item.pos = neuron.pos;
-      item.score = 0; // use this to rate the performance of each neuron
+      item.score = { // use this to rate the performance of each neuron
+        correct: 0,
+        incorrect: 0
+      };
+
       return item;
     });
   }
@@ -372,7 +376,7 @@ var Kohonen = function () {
         var match = this.getNeuron(bmu.pos);
         if (match) {
           var current = match.neuron.hits;
-          var somdi = this._data.somdi[match.index];
+          var somdi = this._data.somdi[i];
 
           this.neurons[match.index].hits = (0, _vector.add)(current, somdi);
         }
@@ -401,7 +405,7 @@ var Kohonen = function () {
     }
   }, {
     key: 'setNeuronScore',
-    value: function setNeuronScore(pos, change) {
+    value: function setNeuronScore(pos, correct) {
       var i = this.neurons.findIndex(function (neuron) {
         return neuron.pos === pos;
       });
@@ -410,7 +414,11 @@ var Kohonen = function () {
         return null;
       }
 
-      this.neurons[i].score += change;
+      if (correct) {
+        this.neurons[i].score.correct += 1;
+      } else {
+        this.neurons[i].score.incorrect += 1;
+      }
     }
 
     // generate somdi index for classIndex defined as input.
@@ -418,7 +426,11 @@ var Kohonen = function () {
 
   }, {
     key: 'SOMDI',
-    value: function SOMDI(classIndex, type) {
+    value: function SOMDI(classIndex, type, threshold) {
+      var _threshold = 0;
+      if (threshold) {
+        _threshold = threshold;
+      }
       var self = this;
 
       // find neurons with max somdi score associated with classIndex
@@ -428,25 +440,59 @@ var Kohonen = function () {
 
         if (type) {
           if (type === 'positive') {
-            return maxIndex === classIndex && neuron.score > 0;
+            return neuron.score.correct > 0 && neuron.score.incorrect === 0;
           }
 
           if (type === 'negative') {
-            return maxIndex === classIndex && neuron.score < 0;
+            return neuron.score.incorrect > 0 && neuron.score.correct === 0;
           }
         }
 
-        return maxIndex === classIndex;
+        return maxIndex === classIndex && neuron.sWeight > _threshold;
       });
 
       // multiply weight by somdiWeight & sum over all neurons
       var somdi = new Array(this.neurons[0].weight.length).fill(0);;
       classNeurons.forEach(function (neuron) {
-        var current = multi(neuron.weight, neuron.sWeight);
+        var current = (0, _vector.mult)(neuron.weight, neuron.sWeight);
         somdi = (0, _vector.add)(somdi, current);
       });
 
+      // divide by the number of activated neurons
+      somdi = (0, _vector.divide)(somdi, classNeurons.length);
+
       return somdi;
+    }
+
+    // get the classes for each neuron. Currently based on somdi
+    // TODO: add support for hit count and neuron performance
+
+  }, {
+    key: 'neuronClasses',
+    value: function neuronClasses(threshold, hits) {
+      var _threshold = 0;
+      if (threshold) {
+        _threshold = threshold;
+      }
+      var self = this;
+      var out = [];
+
+      this.neurons.forEach(function (neuron) {
+        var label = null;
+
+        var index = self.maxIndex(neuron.somdi);
+        if (neuron.somdi[index] > threshold) {
+          label = index;
+        }
+
+        if (hits) {
+          label = self.maxIndex(neuron.hits);
+        }
+
+        out.push({ pos: neuron.pos, class: label });
+      });
+
+      return out;
     }
 
     // expects an array of test samples and array of labels with corresponding indexes
@@ -455,7 +501,7 @@ var Kohonen = function () {
 
   }, {
     key: 'predict',
-    value: function predict(testData, testLabels) {
+    value: function predict(testData, testLabels, predictIndex, falseIndex) {
       var self = this;
 
       // normalise the test data if norm enabled
@@ -480,11 +526,14 @@ var Kohonen = function () {
           }
         }
 
-        // keep score of neurons
-        if (testLabels[index] !== winningIndex) {
-          self.setNeuronScore(bmu.pos, -1);
-        } else {
-          self.setNeuronScore(bmu.pos, 1);
+        // if sample is of type we want to track performance of
+        if (testLabels[index] === predictIndex) {
+          if (winningIndex === predictIndex) {
+            self.setNeuronScore(bmu.pos, true);
+          } else if (winningIndex === falseIndex) {
+            // record neurons that classify incorrectly
+            self.setNeuronScore(bmu.pos, false);
+          }
         }
 
         results.push(winningIndex);
@@ -518,12 +567,14 @@ var Kohonen = function () {
         var vectorLength = this._data.v[0].length;
 
         var somdi = null;
+        var hits = null;
 
         if (labels) {
           var somdiLength = this._data.somdi[0].length;
           var somdi = Array(somdiLength).fill(0).map(function () {
             return Math.random();
           });
+          hits = Array(vectorLength).fill(0);
         }
 
         output.push({
@@ -531,7 +582,7 @@ var Kohonen = function () {
             return Math.random();
           }),
           somdi: somdi,
-          hits: Array(vectorLength).fill(0)
+          hits: hits
         });
       }
 
