@@ -44,7 +44,8 @@ class Kohonen {
     maxNeighborhood = 1,
     norm = true,
     classifer = 'somdi',  // alternative is 'hits',
-    distance // alternative = 'corr'
+    distance, // alternative = 'corr'
+    _window = 0.3
   }) {
 
     // data vectors should have at least one dimension
@@ -74,6 +75,7 @@ class Kohonen {
     this.maxStep = maxStep;
     this.norm = norm;
     this.distance = distance;
+    this.window = _window;
 
     // generate scaleStepLearningCoef,
     // as the learning coef decreases with time
@@ -231,9 +233,22 @@ class Kohonen {
     }
   }
 
-  // TODO: handle critera for sample to be sufficiently close to BMU1 and BMU2
   LVQ2(log) {
     var self = this;
+
+    function getCandidate(pos, sample) {
+      var neuron = self.getNeuron(pos);
+
+      var criteria = self.maxIndex(neuron.somdi);
+      if (self.classifer === 'hits') {
+        criteria = self.maxIndex(neuron.hits);
+      }
+
+      var distance = dist(neuron.weight, sample);
+
+      return {index: neuron.index, label: criteria, distance};
+    }
+
     // reset number of steps
     self.step = 0;
     for (var i=0; i<this.maxStep; i++) {
@@ -242,43 +257,41 @@ class Kohonen {
       var sample = self._data.v[sampleIndex];
       var label = self._data.labels[sampleIndex];
 
-      // find bmu
+      // get info for bmu
       const bmu = self.findBestMatchingUnit(sample);
+      const a = self.getCandidate(bmu.pos, sample);
 
-      // grab the bmu neuron
-      const original = self.getNeuron(bmu.pos);
+      // grab the next best neuron
+      const bmu2 = self.findBestMatchingUnit(sample, 1);
+      const b = self.getCandidate(bmu2.pos, sample);
 
-      if (original) {
-        // find out what class we think this neuron is
-        var criteria = self.maxIndex(original.neuron.somdi);
-        if (self.classifer === 'hits') {
-          criteria = self.maxIndex(original.neuron.hits);
-        }
+      // check sample is close enough to boundary
+      var s = (1 - self.window) / (1 + self.window);
 
-        // TODO: tidy this up with a recursive function
-        if (criteria !== label) {
-          const bmu2 = self.findBestMatchingUnit(sample, 1);
-          const nextBest = self.getNeuron(bmu2.pos);
+      if (_.min([a.distance / b.distance, b.distance / a.distance]) < s) {
+        if (a.label === label) {
+          // make more like a, less like b
+          self.neurons[a.index].weight = self.lvqUpdate(self.neurons[a.index].weight, sample, 0, 0);
+          self.neurons[b.index].weight = self.lvqUpdate(self.neurons[b.index].weight, sample, 0, 1);
 
-          var newCriteria = self.maxIndex(nextBest.neuron.somdi);
-          if (self.classifer === 'hits') {
-            newCriteria = self.maxIndex(nextBest.neuron.hits);
+          // also update SOMDI weights
+          if (self.classifer === 'somdi') {
+            var sampleSMDI = self._data.somdi[sampleIndex];
+            self.neurons[a.index].somdi = self.updateStep(self.neurons[a.index].somdi, sampleSOMDI, 0, 0);
+            self.neurons[b.index].somdi = self.updateStep(self.neurons[b.index].somdi, sampleSOMDI, 0, 1);
           }
-
-          // check if bmu2  is a better match
-          if (newCriteria === label) {
-            // make bmu2 more like sample
-            self.neurons[nextBest.index].weight = self.lvqUpdate(nextBest.neuron.weight, sample, 0, 0);
-
-            // make existing bmu less like sample
-            self.neurons[original.index].weight = self.lvqUpdate(original.neuron.weight, sample, 0, 1);
-
-            // also update SOMDI weights
-            if (self.classifer === 'somdi') {
-              var sampleSMDI = self._data.somdi[sampleIndex];
-              self.neurons[nextBest.index].somdi = self.updateStep(nextBest.neuron.somdi, sampleSOMDI, 0, 0);
-              self.neurons[original.index].somdi = self.updateStep(original.neuron.somdi, sampleSOMDI, 0, 1);
-            }
+        } else if (b.label === label) {
+          // make more like b, less like a
+          // make more like a, less like b
+          self.neurons[b.index].weight = self.lvqUpdate(self.neurons[b.index].weight, sample, 0, 0);
+          self.neurons[a.index].weight = self.lvqUpdate(self.neurons[a.index].weight, sample, 0, 1);
+          
+          // also update SOMDI weights
+          if (self.classifer === 'somdi') {
+            var sampleSMDI = self._data.somdi[sampleIndex];
+            self.neurons[b.index].somdi = self.updateStep(self.neurons[b.index].somdi, sampleSOMDI, 0, 0);
+            self.neurons[a.index].somdi = self.updateStep(self.neurons[a.index].somdi, sampleSOMDI, 0, 1);
+            
           }
         }
       }
