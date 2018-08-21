@@ -20,7 +20,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var manhatten = require('manhattan');
+var mld = require('ml-distance');
 var math = require('mathjs');
 
 // lodash/fp random has a fixed arity of 2, without the last (and useful) param
@@ -615,7 +615,7 @@ var Kohonen = function () {
 
       if (this.distance === 'manhatten') {
         return _fp2.default.flow(_fp2.default.orderBy(function (n) {
-          return manhatten(target, n.weight);
+          return mld.manhatten(target, n.weight);
         }, 'asc'), _fp2.default.nth(index))(this.neurons);
       }
 

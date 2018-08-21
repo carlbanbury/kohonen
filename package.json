@@ -31,7 +31,8 @@
     "d3-scale": "1.0.4",
     "filendir": "^1.0.0",
     "lodash": "4.17.2",
-    "mathjs": "^5.0.3"
+    "mathjs": "^5.0.3",
+    "ml-distance": "^2.1.1"
   },
   "devDependencies": {
     "babel-cli": "6.18.0",

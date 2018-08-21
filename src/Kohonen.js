@@ -2,7 +2,7 @@ import { scaleLinear } from 'd3-scale';
 import { extent, mean, deviation } from 'd3-array';
 import _ from 'lodash/fp';
 import { dist, mult, diff, add, normalize, dotProduct, divide } from './vector';
-const manhatten = require('manhattan')
+const mld = require('ml-distance');
 const math = require('mathjs')
 
 // lodash/fp random has a fixed arity of 2, without the last (and useful) param
@@ -541,7 +541,7 @@ class Kohonen {
     if (this.distance === 'manhatten') {
       return _.flow(
         _.orderBy(
-          n => manhatten(target, n.weight),
+          n => mld.manhatten(target, n.weight),
           'asc',
         ),
         _.nth(index)
