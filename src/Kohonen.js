@@ -2,6 +2,7 @@ import { scaleLinear } from 'd3-scale';
 import { extent, mean, deviation } from 'd3-array';
 import _ from 'lodash/fp';
 import { dist, mult, diff, add, normalize, dotProduct, divide } from './vector';
+const manhatten = require('manhattan')
 const math = require('mathjs')
 
 // lodash/fp random has a fixed arity of 2, without the last (and useful) param
@@ -44,7 +45,7 @@ class Kohonen {
     maxNeighborhood = 1,
     norm = true,
     classifer = 'somdi',  // alternative is 'hits',
-    distance, // alternative = 'corr'
+    distance, // alternative = 'corr', manhatten
     _window = 0.3
   }) {
 
@@ -535,6 +536,16 @@ class Kohonen {
     // allow to check the next best match for LVQ2
     if (n) {
       index = n;
+    }
+
+    if (this.distance === 'manhatten') {
+      return _.flow(
+        _.orderBy(
+          n => manhatten(target, n.weight),
+          'asc',
+        ),
+        _.nth(index)
+      )(this.neurons);
     }
 
     if (this.distance === 'corr') {
