@@ -613,9 +613,9 @@ var Kohonen = function () {
         index = n;
       }
 
-      if (this.distance === 'manhatten') {
+      if (this.distance === 'manhattan') {
         return _fp2.default.flow(_fp2.default.orderBy(function (n) {
-          return mld.manhatten(target, n.weight);
+          return mld.distance.manhattan(target, n.weight);
         }, 'asc'), _fp2.default.nth(index))(this.neurons);
       }
 

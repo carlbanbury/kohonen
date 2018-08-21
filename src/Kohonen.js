@@ -45,7 +45,7 @@ class Kohonen {
     maxNeighborhood = 1,
     norm = true,
     classifer = 'somdi',  // alternative is 'hits',
-    distance, // alternative = 'corr', manhatten
+    distance, // alternative = 'corr', manhattan
     _window = 0.3
   }) {
 
@@ -538,10 +538,10 @@ class Kohonen {
       index = n;
     }
 
-    if (this.distance === 'manhatten') {
+    if (this.distance === 'manhattan') {
       return _.flow(
         _.orderBy(
-          n => mld.manhatten(target, n.weight),
+          n => mld.distance.manhattan(target, n.weight),
           'asc',
         ),
         _.nth(index)
