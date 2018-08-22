@@ -394,7 +394,7 @@ var Kohonen = function () {
         }
 
         // update positions of BMU for sample
-        positions.push(bmu.pos);
+        positions.push([bmu.pos, { class: this._data.labels[i] }]);
       }
 
       return positions;
