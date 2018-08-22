@@ -463,6 +463,10 @@ var Kohonen = function () {
         return maxIndex === classIndex && neuron.sWeight > _threshold;
       });
 
+      var positions = classNeurons.map(function (neuron) {
+        return neuron.pos;
+      });
+
       // multiply weight by somdiWeight & sum over all neurons
       var somdi = new Array(this.neurons[0].weight.length).fill(0);;
       classNeurons.forEach(function (neuron) {
@@ -473,7 +477,7 @@ var Kohonen = function () {
       // divide by the number of activated neurons
       somdi = (0, _vector.divide)(somdi, classNeurons.length);
 
-      return somdi;
+      return { somdi: somdi, positions: positions };
     }
 
     // get the classes for each neuron. Currently based on somdi

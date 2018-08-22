@@ -286,13 +286,13 @@ class Kohonen {
           // make more like a, less like b
           self.neurons[b.index].weight = self.lvqUpdate(self.neurons[b.index].weight, sample, 0, 0);
           self.neurons[a.index].weight = self.lvqUpdate(self.neurons[a.index].weight, sample, 0, 1);
-          
+
           // also update SOMDI weights
           if (self.classifer === 'somdi') {
             var sampleSMDI = self._data.somdi[sampleIndex];
             self.neurons[b.index].somdi = self.updateStep(self.neurons[b.index].somdi, sampleSOMDI, 0, 0);
             self.neurons[a.index].somdi = self.updateStep(self.neurons[a.index].somdi, sampleSOMDI, 0, 1);
-            
+
           }
         }
       }
@@ -408,6 +408,10 @@ class Kohonen {
       return maxIndex === classIndex && neuron.sWeight > _threshold;
     });
 
+    var positions = classNeurons.map(function(neuron) {
+      return neuron.pos;
+    });
+
     // multiply weight by somdiWeight & sum over all neurons
     var somdi = new Array(this.neurons[0].weight.length).fill(0);;
     classNeurons.forEach(function(neuron) {
@@ -418,7 +422,7 @@ class Kohonen {
     // divide by the number of activated neurons
     somdi = divide(somdi, classNeurons.length);
 
-    return somdi;
+    return {somdi: somdi, positions: positions};
   }
 
   // get the classes for each neuron. Currently based on somdi
