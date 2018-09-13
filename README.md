@@ -1,14 +1,15 @@
-# kohonen [![Build Status](https://travis-ci.org/seracio/kohonen.svg?branch=master)](https://travis-ci.org/seracio/kohonen)
-A basic implementation of a Kohonen map in JavaScript
+# kohonen
+A basic implementation of a Kohonen map in JavaScript, forked from here:
+https://github.com/seracio/kohonen
 
-`We are still on an early stage of dev. Do not use this package until v1.0.0 has been released.`
+Beyond the basic Kohonen map or self organising map (SOM), the SOM discriminant index [SOMDI](https://www.researchgate.net/publication/223686662_Self_Organising_Maps_for_variable_selection_Application_to_human_saliva_analysed_by_nuclear_magnetic_resonance_spectroscopy_to_investigate_the_effect_of_an_oral_healthcare_product) is implented to provide variable selection and classification.
 
 ## Usage
 
 ### Import lib
 
 ```
-npm i kohonen --save
+npm i https://github.com/cbanbury/kohonen --save
 ```
 
 Then, in your JS script :
@@ -29,11 +30,15 @@ The Kohonen class is the main class.
 |:----------------:|:----------------:|:----------------:|:----------------:|:----------------:|
 |    neurons       |  grid of neurons |   Array          |       yes        |                  |
 |    data          |  dataset         |   Array of Array |       yes        |                  |
+|    labels        |  datset          |   Array          |       no         |                  |
 |    maxStep       | step max to clamp|   Number         |       no         |     10000        |
 | maxLearningCoef  |                  |   Number         |       no         |      1           |
 | minLearningCoef  |                  |   Number         |       no         |      .3          |
 | maxNeighborhood  |                  |   Number         |       no         |      1           |
 | minNeighborhood  |                  |   Number         |       no         |      .3          |
+|    norm          |  flag            |   Boolean        |       no         |     true         |
+|    distance      |  distance metric |   String         |       no         |     Euclidian    |
+|   classifier     |  method          |   String         |       no         |     somdi        |
 
 ```javascript
 
@@ -48,11 +53,14 @@ const k = new Kohonen({data, neurons: hexagonHelper.generateGrid(10,10)});
 
 `data` parameter is an array of the vectors you want to display. There is no need to standardize your data, that will
  be done internally by scaling each feature to the [0,1] range.
+ 
+ `labels` parameter is an array of integer labels to describe the class that each sample in the data belongs to.
 
-Basically the constructor do :
+The function of the constructor is:
 
 * standardize the given data set
-* initialize random weights for neurons using PCA's largests eigenvectors
+* initialize random weights for neurons
+* bind data and labels, create additional weights for SOMDI if applicable
 
 ##### training method
 
@@ -83,8 +91,29 @@ const myPositions = k.mapping();
 ```javascript
 const umatrix = k.umatrix();
 ```
+##### predict method
+`predict` method returns predictions for some test data, using the SOM
 
+```javascript
+// train the model
+k.training();
 
+// make some predictions
+var testData = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [0.9, 0, 0];
+var testLabels = [0, 1, 2, 0];
+
+var predictions = k.predict(testData, testlabels);
+```
+##### SOMDI method
+`SOMDI` method returns the SOMDI for a given class label
+
+```javascript
+// train the model
+k.training();
+
+// compute SOMDI for given class label
+var somdi = k.SOMDI(0);
+```
 
 ## Example
 
