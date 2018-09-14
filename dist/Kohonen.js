@@ -53,35 +53,36 @@ var Kohonen = function () {
   //
   // You also should normalized your neighborhood in such a way that 2 neighbors
   // got an euclidian distance of 1 between each other.
-  function Kohonen(_ref) {
-    var _ref$neurons = _ref.neurons,
-        neurons = _ref$neurons === undefined ? null : _ref$neurons,
-        _ref$data = _ref.data,
-        data = _ref$data === undefined ? null : _ref$data,
-        _ref$labels = _ref.labels,
-        labels = _ref$labels === undefined ? null : _ref$labels,
-        _ref$maxStep = _ref.maxStep,
-        maxStep = _ref$maxStep === undefined ? 10000 : _ref$maxStep,
-        _ref$minLearningCoef = _ref.minLearningCoef,
-        minLearningCoef = _ref$minLearningCoef === undefined ? .1 : _ref$minLearningCoef,
-        _ref$maxLearningCoef = _ref.maxLearningCoef,
-        maxLearningCoef = _ref$maxLearningCoef === undefined ? .4 : _ref$maxLearningCoef,
-        _ref$minNeighborhood = _ref.minNeighborhood,
-        minNeighborhood = _ref$minNeighborhood === undefined ? .3 : _ref$minNeighborhood,
-        _ref$maxNeighborhood = _ref.maxNeighborhood,
-        maxNeighborhood = _ref$maxNeighborhood === undefined ? 1 : _ref$maxNeighborhood,
-        _ref$norm = _ref.norm,
-        norm = _ref$norm === undefined ? true : _ref$norm,
-        _ref$classifer = _ref.classifer,
-        classifer = _ref$classifer === undefined ? 'somdi' : _ref$classifer,
-        _ref$distance = _ref.distance,
-        distance = _ref$distance === undefined ? null : _ref$distance,
-        _ref$_window = _ref._window,
-        _window = _ref$_window === undefined ? 0.3 : _ref$_window;
-
+  function Kohonen(params) {
     _classCallCheck(this, Kohonen);
 
-    if (arguments.length > 0) {
+    if (params) {
+      var properties = {
+        maxStep: 10000,
+        minLearningCoef: .1,
+        maxLearningCoef: .4,
+        minNeighborhood: .3,
+        maxNeighborhood: 1,
+        norm: true,
+        classifer: 'somdi', // alternative is 'hits',
+        distance: null, // alternative = 'corr', manhattan
+        _window: 0.3
+      };
+
+      properties = _fp2.default.extend(properties, params);
+      var neurons = properties.neurons;
+      var data = properties.data;
+      var labels = properties.labels;
+      var maxStep = properties.maxStep;
+      var minLearningCoef = properties.minLearningCoef;
+      var maxLearningCoef = properties.maxLearningCoef;
+      var minNeighborhood = properties.minNeighborhood;
+      var maxNeighborhood = properties.maxNeighborhood;
+      var norm = properties.norm;
+      var classifer = properties.classifer;
+      var distance = properties.distance;
+      var _window = properties._window;
+
       // data vectors should have at least one dimension
       if (!data[0].length) {
         throw new Error('Kohonen constructor: data vectors should have at least one dimension');

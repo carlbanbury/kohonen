@@ -34,84 +34,97 @@ class Kohonen {
   //
   // You also should normalized your neighborhood in such a way that 2 neighbors
   // got an euclidian distance of 1 between each other.
-  constructor({
-    neurons = null,
-    data = null,
-    labels = null,
-    maxStep = 10000,
-    minLearningCoef = .1,
-    maxLearningCoef = .4,
-    minNeighborhood = .3,
-    maxNeighborhood = 1,
-    norm = true,
-    classifer = 'somdi',  // alternative is 'hits',
-    distance = null, // alternative = 'corr', manhattan
-    _window = 0.3
-  }) {
-    if (arguments.length > 0) {
+  constructor(params) {
+    if (params) {
+      var properties = {
+        maxStep: 10000,
+        minLearningCoef: .1,
+        maxLearningCoef: .4,
+        minNeighborhood: .3,
+        maxNeighborhood: 1,
+        norm: true,
+        classifer: 'somdi',  // alternative is 'hits',
+        distance: null, // alternative = 'corr', manhattan
+        _window: 0.3
+      }
+
+      properties = _.extend(properties, params);
+      var neurons = properties.neurons;
+      var data = properties.data;
+      var labels = properties.labels;
+      var maxStep = properties.maxStep;
+      var minLearningCoef = properties.minLearningCoef;
+      var maxLearningCoef = properties.maxLearningCoef;
+      var minNeighborhood = properties.minNeighborhood;
+      var maxNeighborhood = properties.maxNeighborhood;
+      var norm = properties.norm;
+      var classifer = properties.classifer;
+      var distance = properties.distance;
+      var _window = properties._window;
+
       // data vectors should have at least one dimension
       if (!data[0].length) {
         throw new Error('Kohonen constructor: data vectors should have at least one dimension');
       }
 
-      // all vectors should have the same size
-      // all vectors values should be number
-      for (let ind in data) {
-        if (data[ind].length !== data[0].length) {
-          throw new Error('Kohonen constructor: all vectors should have the same size');
+        // all vectors should have the same size
+        // all vectors values should be number
+        for (let ind in data) {
+          if (data[ind].length !== data[0].length) {
+            throw new Error('Kohonen constructor: all vectors should have the same size');
+          }
+          const allNum = _.reduce(
+            (seed, current) => seed && !isNaN(current) && isFinite(current),
+            true,
+            data[ind]
+            );
+          if(!allNum) {
+            throw new Error('Kohonen constructor: all vectors should number values');
+          }
         }
-        const allNum = _.reduce(
-          (seed, current) => seed && !isNaN(current) && isFinite(current),
-          true,
-          data[ind]
-        );
-        if(!allNum) {
-          throw new Error('Kohonen constructor: all vectors should number values');
-        }
-      }
 
-      this.size = data[0].length;
-      this.numNeurons = neurons.length;
-      this.step = 0;
-      this.maxStep = maxStep;
-      this.norm = norm;
-      this.distance = distance;
-      this.window = _window;
+        this.size = data[0].length;
+        this.numNeurons = neurons.length;
+        this.step = 0;
+        this.maxStep = maxStep;
+        this.norm = norm;
+        this.distance = distance;
+        this.window = _window;
 
-      // generate scaleStepLearningCoef,
-      // as the learning coef decreases with time
-      this.scaleStepLearningCoef = scaleLinear()
+        // generate scaleStepLearningCoef,
+        // as the learning coef decreases with time
+        this.scaleStepLearningCoef = scaleLinear()
         .clamp(true)
         .domain([0, maxStep])
         .range([maxLearningCoef, minLearningCoef]);
 
-      // decrease neighborhood with time
-      this.scaleStepNeighborhood = scaleLinear()
+        // decrease neighborhood with time
+        this.scaleStepNeighborhood = scaleLinear()
         .clamp(true)
         .domain([0, maxStep])
         .range([maxNeighborhood, minNeighborhood]);
 
-      this._data = this.seedLabels(data, labels);
+        this._data = this.seedLabels(data, labels);
 
-      // normalize data
-      if (this.norm) {
-        this._data.v = this.normalize(this._data.v);
-      }
-
-      // On each neuron, generate a random vector v
-      // of <size> dimension
-      // each neuron has [{weight: <vector>, somdi: <vector>, pos: <vector>}]
-      const randomInitialVectors = this.generateInitialVectors(labels);
-      this.neurons = neurons.map(function(neuron, index) {
-        var item = randomInitialVectors[index];
-        item.pos = neuron.pos;
-        item.score = {  // use this to rate the performance of each neuron
-          correct: 0,
-          incorrect: 0
+        // normalize data
+        if (this.norm) {
+          this._data.v = this.normalize(this._data.v);
         }
 
-        return item;
-      });
+        // On each neuron, generate a random vector v
+        // of <size> dimension
+        // each neuron has [{weight: <vector>, somdi: <vector>, pos: <vector>}]
+        const randomInitialVectors = this.generateInitialVectors(labels);
+        this.neurons = neurons.map(function(neuron, index) {
+          var item = randomInitialVectors[index];
+          item.pos = neuron.pos;
+          item.score = {  // use this to rate the performance of each neuron
+            correct: 0,
+            incorrect: 0
+          }
+
+          return item;
+        });
     }
   }
 
