@@ -54,9 +54,12 @@ var Kohonen = function () {
   // You also should normalized your neighborhood in such a way that 2 neighbors
   // got an euclidian distance of 1 between each other.
   function Kohonen(_ref) {
-    var neurons = _ref.neurons,
-        data = _ref.data,
-        labels = _ref.labels,
+    var _ref$neurons = _ref.neurons,
+        neurons = _ref$neurons === undefined ? null : _ref$neurons,
+        _ref$data = _ref.data,
+        data = _ref$data === undefined ? null : _ref$data,
+        _ref$labels = _ref.labels,
+        labels = _ref$labels === undefined ? null : _ref$labels,
         _ref$maxStep = _ref.maxStep,
         maxStep = _ref$maxStep === undefined ? 10000 : _ref$maxStep,
         _ref$minLearningCoef = _ref.minLearningCoef,
@@ -71,7 +74,8 @@ var Kohonen = function () {
         norm = _ref$norm === undefined ? true : _ref$norm,
         _ref$classifer = _ref.classifer,
         classifer = _ref$classifer === undefined ? 'somdi' : _ref$classifer,
-        distance = _ref.distance,
+        _ref$distance = _ref.distance,
+        distance = _ref$distance === undefined ? null : _ref$distance,
         _ref$_window = _ref._window,
         _window = _ref$_window === undefined ? 0.3 : _ref$_window;
 

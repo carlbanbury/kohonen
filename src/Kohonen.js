@@ -35,9 +35,9 @@ class Kohonen {
   // You also should normalized your neighborhood in such a way that 2 neighbors
   // got an euclidian distance of 1 between each other.
   constructor({
-    neurons,
-    data,
-    labels,
+    neurons = null,
+    data = null,
+    labels = null,
     maxStep = 10000,
     minLearningCoef = .1,
     maxLearningCoef = .4,
@@ -45,7 +45,7 @@ class Kohonen {
     maxNeighborhood = 1,
     norm = true,
     classifer = 'somdi',  // alternative is 'hits',
-    distance, // alternative = 'corr', manhattan
+    distance = null, // alternative = 'corr', manhattan
     _window = 0.3
   }) {
     if (arguments.length > 0) {
