@@ -134,10 +134,41 @@ var Kohonen = function () {
     });
   }
 
-  // bind the labels and create SOMDI vectors
+  // method for serializing the class
 
 
   _createClass(Kohonen, [{
+    key: 'export',
+    value: function _export() {
+      return {
+        neurons: this.neurons,
+        _data: this._data,
+        maxStep: this.maxStep,
+        norm: this.norm,
+        distance: this.distance,
+        window: this.window,
+        scaleStepLearningCoef: this.scaleStepLearningCoef,
+        scaleStepNeighborhood: this.scaleStepNeighborhood,
+        step: this.step
+
+      };
+    }
+
+    // method for importing previous settings/model
+
+  }, {
+    key: 'import',
+    value: function _import(setup) {
+      var keys = Object.keys(setup);
+
+      keys.forEach(function (key) {
+        this[key] = setup[key];
+      });
+    }
+
+    // bind the labels and create SOMDI vectors
+
+  }, {
     key: 'seedLabels',
     value: function seedLabels(data, labels) {
       var numClasses = _fp2.default.max(labels) + 1;

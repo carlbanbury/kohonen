@@ -114,6 +114,31 @@ class Kohonen {
     });
   }
 
+  // method for serializing the class
+  export() {
+    return {
+      neurons: this.neurons,
+      _data: this._data,
+      maxStep: this.maxStep,
+      norm: this.norm,
+      distance: this.distance,
+      window: this.window,
+      scaleStepLearningCoef: this.scaleStepLearningCoef,
+      scaleStepNeighborhood: this.scaleStepNeighborhood,
+      step: this.step,
+
+    }
+  }
+
+  // method for importing previous settings/model
+  import(setup) {
+    var keys = Object.keys(setup);
+
+    keys.forEach(function(key) {
+      this[key] = setup[key];
+    });
+  }
+
   // bind the labels and create SOMDI vectors
   seedLabels(data, labels) {
     var numClasses = _.max(labels) + 1;
