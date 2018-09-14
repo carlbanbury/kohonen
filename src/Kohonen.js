@@ -147,9 +147,10 @@ class Kohonen {
   // method for importing previous settings/model
   import(setup) {
     var keys = Object.keys(setup);
+    var self = this;
 
     keys.forEach(function(key) {
-      this[key] = setup[key];
+      self[key] = setup[key];
     });
   }
 
