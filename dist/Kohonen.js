@@ -77,61 +77,63 @@ var Kohonen = function () {
 
     _classCallCheck(this, Kohonen);
 
-    // data vectors should have at least one dimension
-    if (!data[0].length) {
-      throw new Error('Kohonen constructor: data vectors should have at least one dimension');
-    }
-
-    // all vectors should have the same size
-    // all vectors values should be number
-    for (var ind in data) {
-      if (data[ind].length !== data[0].length) {
-        throw new Error('Kohonen constructor: all vectors should have the same size');
+    if (arguments.length > 0) {
+      // data vectors should have at least one dimension
+      if (!data[0].length) {
+        throw new Error('Kohonen constructor: data vectors should have at least one dimension');
       }
-      var allNum = _fp2.default.reduce(function (seed, current) {
-        return seed && !isNaN(current) && isFinite(current);
-      }, true, data[ind]);
-      if (!allNum) {
-        throw new Error('Kohonen constructor: all vectors should number values');
+
+      // all vectors should have the same size
+      // all vectors values should be number
+      for (var ind in data) {
+        if (data[ind].length !== data[0].length) {
+          throw new Error('Kohonen constructor: all vectors should have the same size');
+        }
+        var allNum = _fp2.default.reduce(function (seed, current) {
+          return seed && !isNaN(current) && isFinite(current);
+        }, true, data[ind]);
+        if (!allNum) {
+          throw new Error('Kohonen constructor: all vectors should number values');
+        }
       }
+
+      this.size = data[0].length;
+      this.numNeurons = neurons.length;
+      this.step = 0;
+      this.maxStep = maxStep;
+      this.norm = norm;
+      this.distance = distance;
+      this.window = _window;
+
+      // generate scaleStepLearningCoef,
+      // as the learning coef decreases with time
+      this.scaleStepLearningCoef = (0, _d3Scale.scaleLinear)().clamp(true).domain([0, maxStep]).range([maxLearningCoef, minLearningCoef]);
+
+      // decrease neighborhood with time
+      this.scaleStepNeighborhood = (0, _d3Scale.scaleLinear)().clamp(true).domain([0, maxStep]).range([maxNeighborhood, minNeighborhood]);
+
+      this._data = this.seedLabels(data, labels);
+
+      // normalize data
+      if (this.norm) {
+        this._data.v = this.normalize(this._data.v);
+      }
+
+      // On each neuron, generate a random vector v
+      // of <size> dimension
+      // each neuron has [{weight: <vector>, somdi: <vector>, pos: <vector>}]
+      var randomInitialVectors = this.generateInitialVectors(labels);
+      this.neurons = neurons.map(function (neuron, index) {
+        var item = randomInitialVectors[index];
+        item.pos = neuron.pos;
+        item.score = { // use this to rate the performance of each neuron
+          correct: 0,
+          incorrect: 0
+        };
+
+        return item;
+      });
     }
-
-    this.size = data[0].length;
-    this.numNeurons = neurons.length;
-    this.step = 0;
-    this.maxStep = maxStep;
-    this.norm = norm;
-    this.distance = distance;
-    this.window = _window;
-
-    // generate scaleStepLearningCoef,
-    // as the learning coef decreases with time
-    this.scaleStepLearningCoef = (0, _d3Scale.scaleLinear)().clamp(true).domain([0, maxStep]).range([maxLearningCoef, minLearningCoef]);
-
-    // decrease neighborhood with time
-    this.scaleStepNeighborhood = (0, _d3Scale.scaleLinear)().clamp(true).domain([0, maxStep]).range([maxNeighborhood, minNeighborhood]);
-
-    this._data = this.seedLabels(data, labels);
-
-    // normalize data
-    if (this.norm) {
-      this._data.v = this.normalize(this._data.v);
-    }
-
-    // On each neuron, generate a random vector v
-    // of <size> dimension
-    // each neuron has [{weight: <vector>, somdi: <vector>, pos: <vector>}]
-    var randomInitialVectors = this.generateInitialVectors(labels);
-    this.neurons = neurons.map(function (neuron, index) {
-      var item = randomInitialVectors[index];
-      item.pos = neuron.pos;
-      item.score = { // use this to rate the performance of each neuron
-        correct: 0,
-        incorrect: 0
-      };
-
-      return item;
-    });
   }
 
   // method for serializing the class
