@@ -201,7 +201,6 @@ class Kohonen {
 
   // learn and return corresponding neurons for the dataset
   learn(log) {
-    var self = this;
     for (var i=0; i<this.maxStep; i++) {
       this.learnStep();
       if (log) {
@@ -224,15 +223,15 @@ class Kohonen {
 
     this.neurons.forEach(neuron => {
       // compute neighborhood
-      const currentNeighborhood = self.neighborhood(bmu, neuron);
+      const currentNeighborhood = this.neighborhood(bmu, neuron);
       const scaleFactor = currentNeighborhood * currentLearningCoef;
 
       // update weights for neuron
-      neuron.weight = self.updateStep(neuron.weight, sample, scaleFactor);
+      neuron.weight = this.updateStep(neuron.weight, sample, scaleFactor);
 
       // also update weights of SOMDI
       var sampleSOMDI = this._data.somdi[sampleIndex];
-      neuron.somdi = self.updateStep(neuron.somdi, sampleSOMDI, scaleFactor);
+      neuron.somdi = this.updateStep(neuron.somdi, sampleSOMDI, scaleFactor);
     });
 
     this.step += 1;

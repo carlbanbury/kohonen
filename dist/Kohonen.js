@@ -231,7 +231,6 @@ var Kohonen = function () {
   }, {
     key: 'learn',
     value: function learn(log) {
-      var self = this;
       for (var i = 0; i < this.maxStep; i++) {
         this.learnStep();
         if (log) {
@@ -259,15 +258,15 @@ var Kohonen = function () {
 
       this.neurons.forEach(function (neuron) {
         // compute neighborhood
-        var currentNeighborhood = self.neighborhood(bmu, neuron);
+        var currentNeighborhood = _this.neighborhood(bmu, neuron);
         var scaleFactor = currentNeighborhood * currentLearningCoef;
 
         // update weights for neuron
-        neuron.weight = self.updateStep(neuron.weight, sample, scaleFactor);
+        neuron.weight = _this.updateStep(neuron.weight, sample, scaleFactor);
 
         // also update weights of SOMDI
         var sampleSOMDI = _this._data.somdi[sampleIndex];
-        neuron.somdi = self.updateStep(neuron.somdi, sampleSOMDI, scaleFactor);
+        neuron.somdi = _this.updateStep(neuron.somdi, sampleSOMDI, scaleFactor);
       });
 
       this.step += 1;
