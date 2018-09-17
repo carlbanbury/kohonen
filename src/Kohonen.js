@@ -203,34 +203,40 @@ class Kohonen {
   learn(log) {
     var self = this;
     for (var i=0; i<this.maxStep; i++) {
-      // pick index for random sample
-      var sampleIndex = this.pickDataIndex();
-      var sample = this._data.v[sampleIndex];
-
-      // find bmu
-      const bmu = this.findBestMatchingUnit(sample);
-
-      // compute current learning coef
-      const currentLearningCoef = this.scaleStepLearningCoef(this.step);
-
-      this.neurons.forEach(neuron => {
-        // compute neighborhood
-        const currentNeighborhood = self.neighborhood(bmu, neuron);
-        const scaleFactor = currentNeighborhood * currentLearningCoef;
-
-        // update weights for neuron
-        neuron.weight = self.updateStep(neuron.weight, sample, scaleFactor);
-
-        // also update weights of SOMDI
-        var sampleSOMDI = this._data.somdi[sampleIndex];
-        neuron.somdi = self.updateStep(neuron.somdi, sampleSOMDI, scaleFactor);
-      });
-
-      this.step += 1;
+      this.learnStep();
       if (log) {
         log(this.neurons, this.step);
       }
     }
+  }
+
+  // perform single learning step
+  learnStep() {
+    // pick index for random sample
+    var sampleIndex = this.pickDataIndex();
+    var sample = this._data.v[sampleIndex];
+
+    // find bmu
+    const bmu = this.findBestMatchingUnit(sample);
+
+    // compute current learning coef
+    const currentLearningCoef = this.scaleStepLearningCoef(this.step);
+
+    this.neurons.forEach(neuron => {
+      // compute neighborhood
+      const currentNeighborhood = self.neighborhood(bmu, neuron);
+      const scaleFactor = currentNeighborhood * currentLearningCoef;
+
+      // update weights for neuron
+      neuron.weight = self.updateStep(neuron.weight, sample, scaleFactor);
+
+      // also update weights of SOMDI
+      var sampleSOMDI = this._data.somdi[sampleIndex];
+      neuron.somdi = self.updateStep(neuron.somdi, sampleSOMDI, scaleFactor);
+    });
+
+    this.step += 1;
+    return this.step;
   }
 
   // LVQ optimisation

@@ -231,47 +231,47 @@ var Kohonen = function () {
   }, {
     key: 'learn',
     value: function learn(log) {
+      var self = this;
+      for (var i = 0; i < this.maxStep; i++) {
+        this.learnStep();
+        if (log) {
+          log(this.neurons, this.step);
+        }
+      }
+    }
+
+    // perform single learning step
+
+  }, {
+    key: 'learnStep',
+    value: function learnStep() {
       var _this = this;
 
-      var self = this;
+      // pick index for random sample
+      var sampleIndex = this.pickDataIndex();
+      var sample = this._data.v[sampleIndex];
 
-      var _loop = function _loop() {
-        // pick index for random sample
-        sampleIndex = _this.pickDataIndex();
-        sample = _this._data.v[sampleIndex];
+      // find bmu
+      var bmu = this.findBestMatchingUnit(sample);
 
-        // find bmu
+      // compute current learning coef
+      var currentLearningCoef = this.scaleStepLearningCoef(this.step);
 
-        var bmu = _this.findBestMatchingUnit(sample);
+      this.neurons.forEach(function (neuron) {
+        // compute neighborhood
+        var currentNeighborhood = self.neighborhood(bmu, neuron);
+        var scaleFactor = currentNeighborhood * currentLearningCoef;
 
-        // compute current learning coef
-        var currentLearningCoef = _this.scaleStepLearningCoef(_this.step);
+        // update weights for neuron
+        neuron.weight = self.updateStep(neuron.weight, sample, scaleFactor);
 
-        _this.neurons.forEach(function (neuron) {
-          // compute neighborhood
-          var currentNeighborhood = self.neighborhood(bmu, neuron);
-          var scaleFactor = currentNeighborhood * currentLearningCoef;
+        // also update weights of SOMDI
+        var sampleSOMDI = _this._data.somdi[sampleIndex];
+        neuron.somdi = self.updateStep(neuron.somdi, sampleSOMDI, scaleFactor);
+      });
 
-          // update weights for neuron
-          neuron.weight = self.updateStep(neuron.weight, sample, scaleFactor);
-
-          // also update weights of SOMDI
-          var sampleSOMDI = _this._data.somdi[sampleIndex];
-          neuron.somdi = self.updateStep(neuron.somdi, sampleSOMDI, scaleFactor);
-        });
-
-        _this.step += 1;
-        if (log) {
-          log(_this.neurons, _this.step);
-        }
-      };
-
-      for (var i = 0; i < this.maxStep; i++) {
-        var sampleIndex;
-        var sample;
-
-        _loop();
-      }
+      this.step += 1;
+      return this.step;
     }
 
     // LVQ optimisation
@@ -289,10 +289,10 @@ var Kohonen = function () {
         var label = self._data.labels[sampleIndex];
 
         // find bmu
-        var _bmu = self.findBestMatchingUnit(sample);
+        var bmu = self.findBestMatchingUnit(sample);
 
         // grab the bmu neuron
-        var match = self.getNeuron(_bmu.pos);
+        var match = self.getNeuron(bmu.pos);
 
         if (match) {
           // find out what class we think this neuron is
@@ -344,8 +344,8 @@ var Kohonen = function () {
         var label = self._data.labels[sampleIndex];
 
         // get info for bmu
-        var _bmu2 = self.findBestMatchingUnit(sample);
-        var a = getCandidate(_bmu2.pos, sample);
+        var bmu = self.findBestMatchingUnit(sample);
+        var a = getCandidate(bmu.pos, sample);
 
         // grab the next best neuron
         var bmu2 = self.findBestMatchingUnit(sample, 1);
