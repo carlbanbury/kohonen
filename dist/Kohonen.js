@@ -109,20 +109,11 @@ var Kohonen = function () {
       this.norm = norm;
       this.distance = distance;
       this.window = _window;
+      this.minLearningCoef = minLearningCoef;
+      this.maxLearningCoef = maxLearningCoef;
+      this.minNeighborhood = minNeighborhood;
 
-      // generate scaleStepLearningCoef,
-      // as the learning coef decreases with time
-      this.scaleStepLearningCoef = (0, _d3Scale.scaleLinear)().clamp(true).domain([0, maxStep]).range([maxLearningCoef, minLearningCoef]);
-
-      // decrease neighborhood with time
-      this.scaleStepNeighborhood = (0, _d3Scale.scaleLinear)().clamp(true).domain([0, maxStep]).range([maxNeighborhood, minNeighborhood]);
-
-      this._data = this.seedLabels(data, labels);
-
-      // normalize data
-      if (this.norm) {
-        this._data.v = this.normalize(this._data.v);
-      }
+      this.commonSetup(data, labels);
 
       // On each neuron, generate a random vector v
       // of <size> dimension
@@ -147,31 +138,45 @@ var Kohonen = function () {
   _createClass(Kohonen, [{
     key: 'export',
     value: function _export() {
-      return {
-        neurons: this.neurons,
-        _data: this._data,
-        maxStep: this.maxStep,
-        norm: this.norm,
-        distance: this.distance,
-        window: this.window,
-        scaleStepLearningCoef: this.scaleStepLearningCoef,
-        scaleStepNeighborhood: this.scaleStepNeighborhood,
-        step: this.step
-
-      };
+      var out = _fp2.default.cloneDeep(this);
+      delete out._data;
+      delete out.scaleStepLearningCoef;
+      delete out.scaleStepNeighborhood;
+      return out;
     }
 
     // method for importing previous settings/model
 
   }, {
     key: 'import',
-    value: function _import(setup) {
-      var keys = Object.keys(setup);
-      var self = this;
+    value: function _import(data, labels, props) {
+      var _this = this;
 
+      // populate properties including overwriting neurons
+      var keys = Object.keys(props);
       keys.forEach(function (key) {
-        self[key] = setup[key];
+        _this.key = props[key];
       });
+
+      // seed data and setup learning and neighbourhood functions
+      this.commonSetup(data, labels);
+    }
+  }, {
+    key: 'commonSetup',
+    value: function commonSetup(data, labels) {
+      // generate scaleStepLearningCoef,
+      // as the learning coef decreases with time
+      this.scaleStepLearningCoef = (0, _d3Scale.scaleLinear)().clamp(true).domain([0, this.maxStep]).range([this.maxLearningCoef, this.minLearningCoef]);
+
+      // decrease neighborhood with time
+      this.scaleStepNeighborhood = (0, _d3Scale.scaleLinear)().clamp(true).domain([0, this.maxStep]).range([maxNeighborhood, minNeighborhood]);
+
+      this._data = this.seedLabels(data, labels);
+
+      // normalize data
+      if (this.norm) {
+        this._data.v = this.normalize(this._data.v);
+      }
     }
 
     // bind the labels and create SOMDI vectors
@@ -244,7 +249,7 @@ var Kohonen = function () {
   }, {
     key: 'learnStep',
     value: function learnStep() {
-      var _this = this;
+      var _this2 = this;
 
       // pick index for random sample
       var sampleIndex = this.pickDataIndex();
@@ -258,15 +263,15 @@ var Kohonen = function () {
 
       this.neurons.forEach(function (neuron) {
         // compute neighborhood
-        var currentNeighborhood = _this.neighborhood(bmu, neuron);
+        var currentNeighborhood = _this2.neighborhood(bmu, neuron);
         var scaleFactor = currentNeighborhood * currentLearningCoef;
 
         // update weights for neuron
-        neuron.weight = _this.updateStep(neuron.weight, sample, scaleFactor);
+        neuron.weight = _this2.updateStep(neuron.weight, sample, scaleFactor);
 
         // also update weights of SOMDI
-        var sampleSOMDI = _this._data.somdi[sampleIndex];
-        neuron.somdi = _this.updateStep(neuron.somdi, sampleSOMDI, scaleFactor);
+        var sampleSOMDI = _this2._data.somdi[sampleIndex];
+        neuron.somdi = _this2.updateStep(neuron.somdi, sampleSOMDI, scaleFactor);
       });
 
       this.step += 1;

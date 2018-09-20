@@ -90,26 +90,11 @@ class Kohonen {
         this.norm = norm;
         this.distance = distance;
         this.window = _window;
+        this.minLearningCoef = minLearningCoef;
+        this.maxLearningCoef = maxLearningCoef;
+        this.minNeighborhood = minNeighborhood;
 
-        // generate scaleStepLearningCoef,
-        // as the learning coef decreases with time
-        this.scaleStepLearningCoef = scaleLinear()
-        .clamp(true)
-        .domain([0, maxStep])
-        .range([maxLearningCoef, minLearningCoef]);
-
-        // decrease neighborhood with time
-        this.scaleStepNeighborhood = scaleLinear()
-        .clamp(true)
-        .domain([0, maxStep])
-        .range([maxNeighborhood, minNeighborhood]);
-
-        this._data = this.seedLabels(data, labels);
-
-        // normalize data
-        if (this.norm) {
-          this._data.v = this.normalize(this._data.v);
-        }
+        this.commonSetup(data, labels);
 
         // On each neuron, generate a random vector v
         // of <size> dimension
@@ -130,28 +115,45 @@ class Kohonen {
 
   // method for serializing the class
   export() {
-    return {
-      neurons: this.neurons,
-      _data: this._data,
-      maxStep: this.maxStep,
-      norm: this.norm,
-      distance: this.distance,
-      window: this.window,
-      scaleStepLearningCoef: this.scaleStepLearningCoef,
-      scaleStepNeighborhood: this.scaleStepNeighborhood,
-      step: this.step,
-
-    }
+    var out = _.cloneDeep(this);
+    delete out._data;
+    delete out.scaleStepLearningCoef;
+    delete out.scaleStepNeighborhood;
+    return out;
   }
 
   // method for importing previous settings/model
-  import(setup) {
-    var keys = Object.keys(setup);
-    var self = this;
-
-    keys.forEach(function(key) {
-      self[key] = setup[key];
+  import(data, labels, props) {
+    // populate properties including overwriting neurons
+    var keys = Object.keys(props);
+    keys.forEach((key)=>{
+      this.key = props[key];
     });
+
+    // seed data and setup learning and neighbourhood functions
+    this.commonSetup(data, labels);
+  }
+
+  commonSetup(data, labels) {
+    // generate scaleStepLearningCoef,
+    // as the learning coef decreases with time
+    this.scaleStepLearningCoef = scaleLinear()
+    .clamp(true)
+    .domain([0, this.maxStep])
+    .range([this.maxLearningCoef, this.minLearningCoef]);
+
+    // decrease neighborhood with time
+    this.scaleStepNeighborhood = scaleLinear()
+    .clamp(true)
+    .domain([0, this.maxStep])
+    .range([maxNeighborhood, minNeighborhood]);
+
+    this._data = this.seedLabels(data, labels);
+
+    // normalize data
+    if (this.norm) {
+      this._data.v = this.normalize(this._data.v);
+    }
   }
 
   // bind the labels and create SOMDI vectors
