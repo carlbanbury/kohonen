@@ -169,7 +169,7 @@ var Kohonen = function () {
       this.scaleStepLearningCoef = (0, _d3Scale.scaleLinear)().clamp(true).domain([0, this.maxStep]).range([this.maxLearningCoef, this.minLearningCoef]);
 
       // decrease neighborhood with time
-      this.scaleStepNeighborhood = (0, _d3Scale.scaleLinear)().clamp(true).domain([0, this.maxStep]).range([maxNeighborhood, minNeighborhood]);
+      this.scaleStepNeighborhood = (0, _d3Scale.scaleLinear)().clamp(true).domain([0, this.maxStep]).range([this.maxNeighborhood, this.minNeighborhood]);
 
       this._data = this.seedLabels(data, labels);
 

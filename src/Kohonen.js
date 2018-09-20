@@ -146,7 +146,7 @@ class Kohonen {
     this.scaleStepNeighborhood = scaleLinear()
     .clamp(true)
     .domain([0, this.maxStep])
-    .range([maxNeighborhood, minNeighborhood]);
+    .range([this.maxNeighborhood, this.minNeighborhood]);
 
     this._data = this.seedLabels(data, labels);
 
