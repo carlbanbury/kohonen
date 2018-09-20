@@ -93,6 +93,7 @@ class Kohonen {
         this.minLearningCoef = minLearningCoef;
         this.maxLearningCoef = maxLearningCoef;
         this.minNeighborhood = minNeighborhood;
+        this.maxNeighborhood = maxNeighborhood;
 
         this.commonSetup(data, labels);
 
@@ -127,7 +128,7 @@ class Kohonen {
     // populate properties including overwriting neurons
     var keys = Object.keys(props);
     keys.forEach((key)=>{
-      this.key = props[key];
+      this[key] = props[key];
     });
 
     // seed data and setup learning and neighbourhood functions
