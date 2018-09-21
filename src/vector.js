@@ -37,11 +37,12 @@ export const normalize = function(v) {
 	var min = _.min(v);
 	var range = max - min;
 	return v.map(function(x) {
-        // gracefully handle divide by zero
-        if (range === 0) {
-            return 0;
-        }
-		return (x - min) / range;
+    return x / max;
+  //       // gracefully handle divide by zero
+  //       if (range === 0) {
+  //           return 0;
+  //       }
+		// return (x - min) / range;
 	});
 };
 
