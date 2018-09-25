@@ -13,6 +13,8 @@ var _d3Random = require('d3-random');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var math = require('mathjs');
+
 // euclidian distance of 2 vectors
 var dist = exports.dist = function dist(v1, v2) {
   var d = Math.sqrt(v1.reduce(function (seed, cur, ind) {
@@ -63,15 +65,12 @@ var add = exports.add = function add(v1, v2) {
 
 // scale vector between 0 and 1
 var normalize = exports.normalize = function normalize(v) {
-  var max = _fp2.default.max(v);
-  var min = _fp2.default.min(v);
-  var range = max - min;
+  var mean = math.mean(v);
+  var sigma = math.std(v);
+
+  // standard scaling
   return v.map(function (x) {
-    // gracefully handle divide by zero
-    if (range === 0) {
-      return 0;
-    }
-    return (x - min) / range;
+    return (x - mean) / sigma;
   });
 };
 

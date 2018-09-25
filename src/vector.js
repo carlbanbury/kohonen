@@ -1,5 +1,6 @@
 import _ from 'lodash/fp';
 import { randomNormal } from 'd3-random';
+const math = require('mathjs');
 
 // euclidian distance of 2 vectors
 export const dist = (v1, v2) => {
@@ -33,16 +34,13 @@ export const add = (v1, v2) => v1.map((val, i) => v2[i] + val);
 
 // scale vector between 0 and 1
 export const normalize = function(v) {
-	var max = _.max(v);
-	var min = _.min(v);
-	var range = max - min;
-	return v.map(function(x) {
-        // gracefully handle divide by zero
-        if (range === 0) {
-            return 0;
-        }
-		return (x - min) / range;
-	});
+  var mean = math.mean(v);
+  var sigma = math.std(v);
+
+  // standard scaling
+  return v.map(function(x) {
+    return (x - mean) / sigma;
+  });
 };
 
 // For a given size, return an array of `size` with random values
