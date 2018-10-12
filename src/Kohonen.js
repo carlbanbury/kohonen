@@ -44,6 +44,7 @@ class Kohonen {
         maxNeighborhood: 1,
         norm: true,
         class_method: 'somdi',  // alternative is 'hits', 'supervised'
+        omega: 1,
         distance: null, // alternative = 'corr', manhattan
         _window: 0.3
       }
@@ -61,6 +62,7 @@ class Kohonen {
       var class_method = properties.class_method;
       var distance = properties.distance;
       var _window = properties._window;
+      var omega = properties.omega;
 
       // data vectors should have at least one dimension
       if (!data[0].length) {
@@ -95,6 +97,7 @@ class Kohonen {
         this.minNeighborhood = minNeighborhood;
         this.maxNeighborhood = maxNeighborhood;
         this.class_method = class_method;
+        this.omega = omega;
 
         this.commonSetup(data, labels);
 
@@ -162,13 +165,17 @@ class Kohonen {
   seedLabels(data, labels) {
     var numClasses = _.max(labels) + 1;
     var out = {v: [], labels: [], somdi: []}
-    data.map(function(item, index) {
+    data.map((item, index) => {
       var somdi = [];
 
       if (labels) {
         var currentLabel = labels[index];
         var somdi = new Array(numClasses).fill(0);
         somdi[currentLabel] = 1;
+
+        if (this.class_method === 'supervised') {
+          somdi[currentLabel] = 1 * this.omega;
+        }
       }
 
       out.v.push(item);

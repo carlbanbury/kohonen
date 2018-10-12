@@ -65,6 +65,7 @@ var Kohonen = function () {
         maxNeighborhood: 1,
         norm: true,
         class_method: 'somdi', // alternative is 'hits', 'supervised'
+        omega: 1,
         distance: null, // alternative = 'corr', manhattan
         _window: 0.3
       };
@@ -82,6 +83,7 @@ var Kohonen = function () {
       var class_method = properties.class_method;
       var distance = properties.distance;
       var _window = properties._window;
+      var omega = properties.omega;
 
       // data vectors should have at least one dimension
       if (!data[0].length) {
@@ -114,6 +116,7 @@ var Kohonen = function () {
       this.minNeighborhood = minNeighborhood;
       this.maxNeighborhood = maxNeighborhood;
       this.class_method = class_method;
+      this.omega = omega;
 
       this.commonSetup(data, labels);
 
@@ -186,6 +189,8 @@ var Kohonen = function () {
   }, {
     key: 'seedLabels',
     value: function seedLabels(data, labels) {
+      var _this2 = this;
+
       var numClasses = _fp2.default.max(labels) + 1;
       var out = { v: [], labels: [], somdi: [] };
       data.map(function (item, index) {
@@ -195,6 +200,10 @@ var Kohonen = function () {
           var currentLabel = labels[index];
           var somdi = new Array(numClasses).fill(0);
           somdi[currentLabel] = 1;
+
+          if (_this2.class_method === 'supervised') {
+            somdi[currentLabel] = 1 * _this2.omega;
+          }
         }
 
         out.v.push(item);
@@ -251,7 +260,7 @@ var Kohonen = function () {
   }, {
     key: 'learnStep',
     value: function learnStep() {
-      var _this2 = this;
+      var _this3 = this;
 
       // pick index for random sample
       var sampleIndex = this.pickDataIndex();
@@ -271,14 +280,14 @@ var Kohonen = function () {
 
       this.neurons.forEach(function (neuron) {
         // compute neighborhood
-        var currentNeighborhood = _this2.neighborhood(bmu, neuron);
+        var currentNeighborhood = _this3.neighborhood(bmu, neuron);
         var scaleFactor = currentNeighborhood * currentLearningCoef;
 
         // update weights for neuron
-        neuron.weight = _this2.updateStep(neuron.weight, sample, scaleFactor);
+        neuron.weight = _this3.updateStep(neuron.weight, sample, scaleFactor);
 
         // also update weights of SOMDI
-        neuron.somdi = _this2.updateStep(neuron.somdi, sampleSOMDI, scaleFactor);
+        neuron.somdi = _this3.updateStep(neuron.somdi, sampleSOMDI, scaleFactor);
       });
 
       this.step += 1;
