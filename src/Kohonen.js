@@ -43,7 +43,7 @@ class Kohonen {
         minNeighborhood: .3,
         maxNeighborhood: 1,
         norm: true,
-        classifer: 'somdi',  // alternative is 'hits', 'supervised'
+        class_method: 'somdi',  // alternative is 'hits', 'supervised'
         distance: null, // alternative = 'corr', manhattan
         _window: 0.3
       }
@@ -58,7 +58,7 @@ class Kohonen {
       var minNeighborhood = properties.minNeighborhood;
       var maxNeighborhood = properties.maxNeighborhood;
       var norm = properties.norm;
-      var classifer = properties.classifer;
+      var class_method = properties.class_method;
       var distance = properties.distance;
       var _window = properties._window;
 
@@ -94,6 +94,7 @@ class Kohonen {
         this.maxLearningCoef = maxLearningCoef;
         this.minNeighborhood = minNeighborhood;
         this.maxNeighborhood = maxNeighborhood;
+        this.class_method = class_method;
 
         this.commonSetup(data, labels);
 
@@ -220,7 +221,7 @@ class Kohonen {
     var sampleSOMDI = this._data.somdi[sampleIndex];
 
     // find bmu
-    if (this.classifer === 'supervised') {
+    if (this.class_method === 'supervised') {
       console.log('using supervised classifier');
       var bmu = this.findBestMatchingUnit(sample.concat(sampleSOMDI));
     } else {
@@ -267,7 +268,7 @@ class Kohonen {
       var neuron = self.getNeuron(pos);
 
       var criteria = self.maxIndex(neuron.neuron.somdi);
-      if (self.classifer === 'hits') {
+      if (self.class_method === 'hits') {
         criteria = self.maxIndex(neuron.neuron.hits);
       }
 
@@ -302,7 +303,7 @@ class Kohonen {
           self.neurons[b.index].weight = self.lvqUpdate(self.neurons[b.index].weight, sample, 0, 1);
 
           // also update SOMDI weights
-          if (self.classifer === 'somdi') {
+          if (self.class_method === 'somdi') {
             var sampleSMDI = self._data.somdi[sampleIndex];
             self.neurons[a.index].somdi = self.updateStep(self.neurons[a.index].somdi, sampleSOMDI, 0, 0);
             self.neurons[b.index].somdi = self.updateStep(self.neurons[b.index].somdi, sampleSOMDI, 0, 1);
@@ -314,7 +315,7 @@ class Kohonen {
           self.neurons[a.index].weight = self.lvqUpdate(self.neurons[a.index].weight, sample, 0, 1);
 
           // also update SOMDI weights
-          if (self.classifer === 'somdi') {
+          if (self.class_method === 'somdi') {
             var sampleSMDI = self._data.somdi[sampleIndex];
             self.neurons[b.index].somdi = self.updateStep(self.neurons[b.index].somdi, sampleSOMDI, 0, 0);
             self.neurons[a.index].somdi = self.updateStep(self.neurons[a.index].somdi, sampleSOMDI, 0, 1);
@@ -498,7 +499,7 @@ class Kohonen {
       var winningIndex = -1;
       var match = self.getNeuron(bmu.pos);
       if (match) {
-        if (self.classifer === 'hits') {
+        if (self.class_method === 'hits') {
           var hits = match.neuron.hits;
           winningIndex = self.maxIndex(hits);
         } else {
