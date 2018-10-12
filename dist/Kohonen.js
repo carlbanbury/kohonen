@@ -260,9 +260,9 @@ var Kohonen = function () {
       // find bmu
       if (this.classifer === 'supervised') {
         console.log('using supervised classifier');
-        bmu = this.findBestMatchingUnit(sample.concat(sampleSOMDI));
+        var bmu = this.findBestMatchingUnit(sample.concat(sampleSOMDI));
       } else {
-        var _bmu = this.findBestMatchingUnit(sample);
+        var bmu = this.findBestMatchingUnit(sample);
       }
 
       // compute current learning coef
@@ -327,8 +327,8 @@ var Kohonen = function () {
         var label = self._data.labels[sampleIndex];
 
         // get info for bmu
-        var _bmu2 = self.findBestMatchingUnit(sample);
-        var a = getCandidate(_bmu2.pos, sample);
+        var bmu = self.findBestMatchingUnit(sample);
+        var a = getCandidate(bmu.pos, sample);
 
         // grab the next best neuron
         var bmu2 = self.findBestMatchingUnit(sample, 1);

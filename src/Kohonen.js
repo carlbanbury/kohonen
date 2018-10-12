@@ -222,9 +222,9 @@ class Kohonen {
     // find bmu
     if (this.classifer === 'supervised') {
       console.log('using supervised classifier');
-      bmu = this.findBestMatchingUnit(sample.concat(sampleSOMDI));
+      var bmu = this.findBestMatchingUnit(sample.concat(sampleSOMDI));
     } else {
-      const bmu = this.findBestMatchingUnit(sample);
+      var bmu = this.findBestMatchingUnit(sample);
     }
 
     // compute current learning coef
