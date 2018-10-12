@@ -64,7 +64,7 @@ var Kohonen = function () {
         minNeighborhood: .3,
         maxNeighborhood: 1,
         norm: true,
-        classifer: 'somdi', // alternative is 'hits',
+        classifer: 'somdi', // alternative is 'hits', 'supervised'
         distance: null, // alternative = 'corr', manhattan
         _window: 0.3
       };
@@ -255,9 +255,15 @@ var Kohonen = function () {
       // pick index for random sample
       var sampleIndex = this.pickDataIndex();
       var sample = this._data.v[sampleIndex];
+      var sampleSOMDI = this._data.somdi[sampleIndex];
 
       // find bmu
-      var bmu = this.findBestMatchingUnit(sample);
+      if (this.classifer === 'supervised') {
+        console.log('using supervised classifier');
+        bmu = this.findBestMatchingUnit(sample.concat(sampleSOMDI));
+      } else {
+        var _bmu = this.findBestMatchingUnit(sample);
+      }
 
       // compute current learning coef
       var currentLearningCoef = this.scaleStepLearningCoef(this.step);
@@ -271,7 +277,6 @@ var Kohonen = function () {
         neuron.weight = _this2.updateStep(neuron.weight, sample, scaleFactor);
 
         // also update weights of SOMDI
-        var sampleSOMDI = _this2._data.somdi[sampleIndex];
         neuron.somdi = _this2.updateStep(neuron.somdi, sampleSOMDI, scaleFactor);
       });
 
@@ -288,35 +293,8 @@ var Kohonen = function () {
       // reset number of steps
       self.step = 0;
       for (var i = 0; i < this.maxStep; i++) {
-        // pick index for random sample
-        var sampleIndex = self.pickDataIndex();
-        var sample = self._data.v[sampleIndex];
-        var label = self._data.labels[sampleIndex];
+        this.learnStep();
 
-        // find bmu
-        var bmu = self.findBestMatchingUnit(sample);
-
-        // grab the bmu neuron
-        var match = self.getNeuron(bmu.pos);
-
-        if (match) {
-          // find out what class we think this neuron is
-          var criteria = self.maxIndex(match.neuron.somdi);
-          if (self.classifer === 'hits') {
-            criteria = self.maxIndex(match.neuron.hits);
-          }
-
-          // update the weight of the neuron
-          self.neurons[match.index].weight = self.lvqUpdate(match.neuron.weight, sample, label, criteria);
-
-          if (self.classifer === 'somdi') {
-            // also update SOMDI weights
-            var sampleSMDI = self._data.somdi[sampleIndex];
-            self.neurons[match.index].somdi = self.updateStep(match.neuron.somdi, sampleSOMDI, label, criteria);
-          }
-        }
-
-        self.step += 1;
         if (log) {
           log(self.neurons, self.step);
         }
@@ -349,8 +327,8 @@ var Kohonen = function () {
         var label = self._data.labels[sampleIndex];
 
         // get info for bmu
-        var bmu = self.findBestMatchingUnit(sample);
-        var a = getCandidate(bmu.pos, sample);
+        var _bmu2 = self.findBestMatchingUnit(sample);
+        var a = getCandidate(_bmu2.pos, sample);
 
         // grab the next best neuron
         var bmu2 = self.findBestMatchingUnit(sample, 1);
@@ -661,20 +639,25 @@ var Kohonen = function () {
         index = n;
       }
 
+      var _weight = n.weight;
+      if (target.length > _weight.length) {
+        var _weight = n.weight.concat(n.somdi);
+      }
+
       if (this.distance === 'manhattan') {
         return _fp2.default.flow(_fp2.default.orderBy(function (n) {
-          return mld.distance.manhattan(target, n.weight);
+          return mld.distance.manhattan(target, _weight);
         }, 'asc'), _fp2.default.nth(index))(this.neurons);
       }
 
       if (this.distance === 'corr') {
         return _fp2.default.flow(_fp2.default.orderBy(function (n) {
-          return (0, _vector.dotProduct)(target, n.weight);
+          return (0, _vector.dotProduct)(target, _weight);
         }, 'desc'), _fp2.default.nth(index))(this.neurons);
       }
 
       return _fp2.default.flow(_fp2.default.orderBy(function (n) {
-        return (0, _vector.dist)(target, n.weight);
+        return (0, _vector.dist)(target, _weight);
       }, 'asc'), _fp2.default.nth(index))(this.neurons);
     }
 
