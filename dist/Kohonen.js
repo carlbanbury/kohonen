@@ -639,25 +639,28 @@ var Kohonen = function () {
         index = n;
       }
 
-      var _weight = n.weight;
-      if (target.length > _weight.length) {
-        var _weight = n.weight.concat(n.somdi);
-      }
+      var getWeight = function getWeight(neuron) {
+        if (target.length > neuron.weight.length) {
+          return neuron.weight.concat(neuron.somdi);
+        }
+
+        return neruon.weight;
+      };
 
       if (this.distance === 'manhattan') {
         return _fp2.default.flow(_fp2.default.orderBy(function (n) {
-          return mld.distance.manhattan(target, _weight);
+          return mld.distance.manhattan(target, getWeight(n));
         }, 'asc'), _fp2.default.nth(index))(this.neurons);
       }
 
       if (this.distance === 'corr') {
         return _fp2.default.flow(_fp2.default.orderBy(function (n) {
-          return (0, _vector.dotProduct)(target, _weight);
+          return (0, _vector.dotProduct)(target, getWeight(n));
         }, 'desc'), _fp2.default.nth(index))(this.neurons);
       }
 
       return _fp2.default.flow(_fp2.default.orderBy(function (n) {
-        return (0, _vector.dist)(target, _weight);
+        return (0, _vector.dist)(target, getWeight(n));
       }, 'asc'), _fp2.default.nth(index))(this.neurons);
     }
 

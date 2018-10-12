@@ -568,15 +568,18 @@ class Kohonen {
       index = n;
     }
 
-    var _weight = n.weight;
-    if (target.length > _weight.length) {
-      var _weight = n.weight.concat(n.somdi);
+    var getWeight = (neuron) => {
+      if (target.length > neuron.weight.length) {
+        return neuron.weight.concat(neuron.somdi);
+      }
+
+      return neruon.weight;
     }
 
     if (this.distance === 'manhattan') {
       return _.flow(
         _.orderBy(
-          n => mld.distance.manhattan(target, _weight),
+          n => mld.distance.manhattan(target, getWeight(n)),
           'asc',
         ),
         _.nth(index)
@@ -586,7 +589,7 @@ class Kohonen {
     if (this.distance === 'corr') {
       return _.flow(
         _.orderBy(
-          n => dotProduct(target, _weight),
+          n => dotProduct(target, getWeight(n)),
           'desc',
         ),
         _.nth(index)
@@ -595,7 +598,7 @@ class Kohonen {
 
     return _.flow(
       _.orderBy(
-        n => dist(target, _weight),
+        n => dist(target, getWeight(n)),
         'asc',
       ),
       _.nth(index)
