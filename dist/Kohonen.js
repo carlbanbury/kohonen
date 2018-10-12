@@ -644,7 +644,7 @@ var Kohonen = function () {
           return neuron.weight.concat(neuron.somdi);
         }
 
-        return neruon.weight;
+        return neuron.weight;
       };
 
       if (this.distance === 'manhattan') {
