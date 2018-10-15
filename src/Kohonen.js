@@ -368,7 +368,7 @@ class Kohonen {
     var positions = [];
 
     // reset hit counts for all neurons
-    this.neurons.forEach(function(neuron, index) {
+    this.neurons.forEach((neuron, index)=> {
       this.neurons[index].hits = 0;
     });
 

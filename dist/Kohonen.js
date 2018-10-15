@@ -411,11 +411,13 @@ var Kohonen = function () {
   }, {
     key: 'mapping',
     value: function mapping() {
+      var _this4 = this;
+
       var positions = [];
 
       // reset hit counts for all neurons
       this.neurons.forEach(function (neuron, index) {
-        this.neurons[index].hits = 0;
+        _this4.neurons[index].hits = 0;
       });
 
       for (var i = 0; i < this._data.v.length; i++) {
