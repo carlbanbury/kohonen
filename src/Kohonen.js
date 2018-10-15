@@ -366,6 +366,12 @@ class Kohonen {
 
   mapping() {
     var positions = [];
+
+    // reset hit counts for all neurons
+    this.neurons.forEach(function(neuron, index) {
+      this.neurons[index].hits = 0;
+    });
+
     for (var i=0; i<this._data.v.length; i++) {
       var sample = this._data.v[i];
       var bmu = this.findBestMatchingUnit(sample);
@@ -384,6 +390,19 @@ class Kohonen {
     }
 
     return positions;
+  }
+
+  // measure of how similar the data is to the model
+  qFactor() {
+    var Q =[];
+    for (var i=0; i<this._data.v.length; i++) {
+      var sample = this._data.v[i];
+      var bmu = this.findBestMatchingUnit(sample);
+      Q.push(dist(sample, bmu));
+    }
+
+    // return the average q factor
+    return math.mean(Q);
   }
 
   // get the neuron and it's index for a given [x, y] position
