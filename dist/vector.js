@@ -70,6 +70,9 @@ var normalize = exports.normalize = function normalize(v) {
 
   // standard scaling
   return v.map(function (x) {
+    if (sigma === 0) {
+      return 0;
+    }
     return (x - mean) / sigma;
   });
 };
