@@ -326,7 +326,7 @@ var Kohonen = function () {
           if (self.class_method === 'somdi') {
             // also update SOMDI weights
             var sampleSOMDI = self._data.somdi[sampleIndex];
-            self.neurons[match.index].somdi = self.updateStep(match.neuron.somdi, sampleSOMDI, label, criteria);
+            self.neurons[match.index].somdi = self.lvqUpdate(match.neuron.somdi, sampleSOMDI, label, criteria);
           }
         }
 
