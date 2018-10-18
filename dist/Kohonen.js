@@ -177,7 +177,7 @@ var Kohonen = function () {
       this.scaleStepNeighborhood = (0, _d3Scale.scaleLinear)().clamp(true).domain([0, this.maxStep]).range([this.maxNeighborhood, this.minNeighborhood]);
 
       this._data = this.seedLabels(data, labels);
-
+      this.somdiLength = _fp2.default.max(labels);
       // normalize data
       if (this.norm) {
         this._data.v = this.normalize(this._data.v);
@@ -417,7 +417,7 @@ var Kohonen = function () {
 
       // reset hit counts for all neurons
       this.neurons.forEach(function (neuron, index) {
-        _this4.neurons[index].hits = 0;
+        _this4.neurons[index].hits = Array(_this4.somdiLength).fill(0);
       });
 
       for (var i = 0; i < this._data.v.length; i++) {
@@ -642,11 +642,10 @@ var Kohonen = function () {
         var hits = null;
 
         if (labels) {
-          var somdiLength = this._data.somdi[0].length;
-          var somdi = Array(somdiLength).fill(0).map(function () {
+          var somdi = Array(this.somdiLength).fill(0).map(function () {
             return Math.random();
           });
-          hits = Array(vectorLength).fill(0);
+          hits = Array(this.somdiLength).fill(0);
         }
 
         output.push({

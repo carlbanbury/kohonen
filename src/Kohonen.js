@@ -154,7 +154,7 @@ class Kohonen {
     .range([this.maxNeighborhood, this.minNeighborhood]);
 
     this._data = this.seedLabels(data, labels);
-
+    this.somdiLength = _.max(labels);
     // normalize data
     if (this.norm) {
       this._data.v = this.normalize(this._data.v);
@@ -369,7 +369,7 @@ class Kohonen {
 
     // reset hit counts for all neurons
     this.neurons.forEach((neuron, index)=> {
-      this.neurons[index].hits = 0;
+      this.neurons[index].hits = Array(this.somdiLength).fill(0);
     });
 
     for (var i=0; i<this._data.v.length; i++) {
@@ -571,9 +571,8 @@ class Kohonen {
       var hits = null;
 
       if (labels) {
-        var somdiLength = this._data.somdi[0].length;
-        var somdi = Array(somdiLength).fill(0).map(()=>Math.random());
-        hits = Array(vectorLength).fill(0);
+        var somdi = Array(this.somdiLength).fill(0).map(()=>Math.random());
+        hits = Array(this.somdiLength).fill(0);
       }
 
       output.push({
