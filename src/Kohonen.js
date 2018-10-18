@@ -154,7 +154,7 @@ class Kohonen {
     .range([this.maxNeighborhood, this.minNeighborhood]);
 
     this._data = this.seedLabels(data, labels);
-    this.somdiLength = _.max(labels);
+    this.somdiLength = _.max(labels) + 1;
     // normalize data
     if (this.norm) {
       this._data.v = this.normalize(this._data.v);

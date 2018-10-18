@@ -177,7 +177,7 @@ var Kohonen = function () {
       this.scaleStepNeighborhood = (0, _d3Scale.scaleLinear)().clamp(true).domain([0, this.maxStep]).range([this.maxNeighborhood, this.minNeighborhood]);
 
       this._data = this.seedLabels(data, labels);
-      this.somdiLength = _fp2.default.max(labels);
+      this.somdiLength = _fp2.default.max(labels) + 1;
       // normalize data
       if (this.norm) {
         this._data.v = this.normalize(this._data.v);
