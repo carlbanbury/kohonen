@@ -259,8 +259,35 @@ class Kohonen {
     // reset number of steps
     self.step = 0;
     for (var i=0; i<this.maxStep; i++) {
-      this.learnStep();
+      // pick index for random sample
+      var sampleIndex = self.pickDataIndex();
+      var sample = self._data.v[sampleIndex];
+      var label = self._data.labels[sampleIndex];
 
+      // find bmu
+      const bmu = self.findBestMatchingUnit(sample);
+
+      // grab the bmu neuron
+      const match = self.getNeuron(bmu.pos);
+
+      if (match) {
+        // find out what class we think this neuron is
+        var criteria = self.maxIndex(match.neuron.somdi);
+        if (self.class_method === 'hits') {
+          criteria = self.maxIndex(match.neuron.hits);
+        }
+
+        // update the weight of the neuron
+        self.neurons[match.index].weight = self.lvqUpdate(match.neuron.weight, sample, label, criteria);
+
+        if (self.class_method === 'somdi') {
+          // also update SOMDI weights
+          var sampleSMDI = self._data.somdi[sampleIndex];
+          self.neurons[match.index].somdi = self.updateStep(match.neuron.somdi, sampleSOMDI, label, criteria);
+        }
+      }
+
+      self.step += 1;
       if (log) {
         log(self.neurons, self.step);
       }
