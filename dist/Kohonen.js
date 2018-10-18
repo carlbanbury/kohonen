@@ -449,7 +449,7 @@ var Kohonen = function () {
       for (var i = 0; i < this._data.v.length; i++) {
         var sample = this._data.v[i];
         var bmu = this.findBestMatchingUnit(sample);
-        Q.push((0, _vector.dist)(sample, bmu));
+        Q.push((0, _vector.dist)(sample, bmu.weight));
       }
 
       // return the average q factor

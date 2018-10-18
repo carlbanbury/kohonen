@@ -398,7 +398,7 @@ class Kohonen {
     for (var i=0; i<this._data.v.length; i++) {
       var sample = this._data.v[i];
       var bmu = this.findBestMatchingUnit(sample);
-      Q.push(dist(sample, bmu));
+      Q.push(dist(sample, bmu.weight));
     }
 
     // return the average q factor
