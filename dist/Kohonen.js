@@ -382,8 +382,8 @@ var Kohonen = function () {
             // also update SOMDI weights
             if (self.class_method === 'somdi') {
               var sampleSMDI = self._data.somdi[sampleIndex];
-              self.neurons[a.index].somdi = self.updateStep(self.neurons[a.index].somdi, sampleSOMDI, 0, 0);
-              self.neurons[b.index].somdi = self.updateStep(self.neurons[b.index].somdi, sampleSOMDI, 0, 1);
+              self.neurons[a.index].somdi = self.lvqUpdate(self.neurons[a.index].somdi, sampleSOMDI, 0, 0);
+              self.neurons[b.index].somdi = self.lvqUpdate(self.neurons[b.index].somdi, sampleSOMDI, 0, 1);
             }
           } else if (b.label === label) {
             // make more like b, less like a
@@ -394,8 +394,8 @@ var Kohonen = function () {
             // also update SOMDI weights
             if (self.class_method === 'somdi') {
               var sampleSMDI = self._data.somdi[sampleIndex];
-              self.neurons[b.index].somdi = self.updateStep(self.neurons[b.index].somdi, sampleSOMDI, 0, 0);
-              self.neurons[a.index].somdi = self.updateStep(self.neurons[a.index].somdi, sampleSOMDI, 0, 1);
+              self.neurons[b.index].somdi = self.lvqUpdate(self.neurons[b.index].somdi, sampleSOMDI, 0, 0);
+              self.neurons[a.index].somdi = self.lvqUpdate(self.neurons[a.index].somdi, sampleSOMDI, 0, 1);
             }
           }
         }
