@@ -575,6 +575,37 @@ class Kohonen {
     return results;
   }
 
+  _predict(testData) {
+    var self = this;
+
+    // normalise the test data if norm enabled
+    if (this.norm) {
+      testData = self.normalize(testData);
+    }
+
+    var results = [];
+    testData.forEach(function(item, index) {
+     var bmu = self.findBestMatchingUnit(item);
+
+      // Hit count based classification
+      var winningIndex = -1;
+      var match = self.getNeuron(bmu.pos);
+      if (match) {
+        if (self.class_method === 'hits') {
+          var hits = match.neuron.hits;
+          winningIndex = self.maxIndex(hits);
+        } else {
+          // SOMDI based calculation of winning neuron
+          var winningIndex = self.maxIndex(match.neuron.somdi);
+        }
+      }
+
+      results.push(winningIndex);
+    });
+
+    return results;
+  }
+
   weights() {
     return this.neurons;
   }
