@@ -74,6 +74,7 @@ var Kohonen = function () {
       var neurons = properties.neurons;
       var data = properties.data;
       var labels = properties.labels;
+      var labelEnum = properties.labelEnum;
       var maxStep = properties.maxStep;
       var minLearningCoef = properties.minLearningCoef;
       var maxLearningCoef = properties.maxLearningCoef;
@@ -106,6 +107,7 @@ var Kohonen = function () {
 
       this.size = data[0].length;
       this.numNeurons = neurons.length;
+      this.labelEnum = labelEnum;
       this.step = 0;
       this.maxStep = maxStep;
       this.norm = norm;
