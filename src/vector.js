@@ -33,16 +33,30 @@ export const diff = (v1, v2) => v1.map((val, i) => v2[i] - val);
 export const add = (v1, v2) => v1.map((val, i) => v2[i] + val);
 
 // scale vector between 0 and 1
-export const normalize = function(v) {
-  var mean = math.mean(v);
-  var sigma = math.std(v);
+export const normalize = function(v, type) {
+  if (type === 'zscore') {
+    var mean = math.mean(v);
+    var sigma = math.std(v);
 
-  // standard scaling
+    // standard scaling
+    return v.map(function(x) {
+      if (sigma === 0) {
+        return 0;
+      }
+      return (x - mean) / sigma;
+    });
+  }
+
+  var min = _.min(v);
+  var max = _.max(v);
+
+  var range = (max-min);
+
   return v.map(function(x) {
-    if (sigma === 0) {
+    if (range === 0) {
       return 0;
     }
-    return (x - mean) / sigma;
+    return (x - min) / range;
   });
 };
 

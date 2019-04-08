@@ -42,7 +42,7 @@ class Kohonen {
         maxLearningCoef: .4,
         minNeighborhood: .3,
         maxNeighborhood: 1,
-        norm: true,
+        norm: true, // zscore or max
         class_method: 'somdi',  // alternative is 'hits', 'supervised'
         omega: 1,
         distance: null, // alternative = 'corr', manhattan
@@ -205,9 +205,8 @@ class Kohonen {
   }
 
   normalize(data) {
-    // TODO: Scale this properly between 0 and 1
-    data.forEach(function(item, index) {
-      data[index] = normalize(item);
+    data.forEach((item, index)=>{
+      data[index] = normalize(item, this.norm);
     });
     return data;
   }

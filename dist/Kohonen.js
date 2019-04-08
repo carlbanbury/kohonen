@@ -63,7 +63,7 @@ var Kohonen = function () {
         maxLearningCoef: .4,
         minNeighborhood: .3,
         maxNeighborhood: 1,
-        norm: true,
+        norm: true, // zscore or max
         class_method: 'somdi', // alternative is 'hits', 'supervised'
         omega: 1,
         distance: null, // alternative = 'corr', manhattan
@@ -237,9 +237,10 @@ var Kohonen = function () {
   }, {
     key: 'normalize',
     value: function normalize(data) {
-      // TODO: Scale this properly between 0 and 1
+      var _this3 = this;
+
       data.forEach(function (item, index) {
-        data[index] = (0, _vector.normalize)(item);
+        data[index] = (0, _vector.normalize)(item, _this3.norm);
       });
       return data;
     }
@@ -262,7 +263,7 @@ var Kohonen = function () {
   }, {
     key: 'learnStep',
     value: function learnStep() {
-      var _this3 = this;
+      var _this4 = this;
 
       // pick index for random sample
       var sampleIndex = this.pickDataIndex();
@@ -281,14 +282,14 @@ var Kohonen = function () {
 
       this.neurons.forEach(function (neuron) {
         // compute neighborhood
-        var currentNeighborhood = _this3.neighborhood(bmu, neuron);
+        var currentNeighborhood = _this4.neighborhood(bmu, neuron);
         var scaleFactor = currentNeighborhood * currentLearningCoef;
 
         // update weights for neuron
-        neuron.weight = _this3.updateStep(neuron.weight, sample, scaleFactor);
+        neuron.weight = _this4.updateStep(neuron.weight, sample, scaleFactor);
 
         // also update weights of SOMDI
-        neuron.somdi = _this3.updateStep(neuron.somdi, sampleSOMDI, scaleFactor);
+        neuron.somdi = _this4.updateStep(neuron.somdi, sampleSOMDI, scaleFactor);
       });
 
       this.step += 1;
@@ -439,13 +440,13 @@ var Kohonen = function () {
   }, {
     key: 'mapping',
     value: function mapping() {
-      var _this4 = this;
+      var _this5 = this;
 
       var positions = [];
 
       // reset hit counts for all neurons
       this.neurons.forEach(function (neuron, index) {
-        _this4.neurons[index].hits = Array(_this4.somdiLength).fill(0);
+        _this5.neurons[index].hits = Array(_this5.somdiLength).fill(0);
       });
 
       for (var i = 0; i < this._data.v.length; i++) {

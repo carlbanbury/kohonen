@@ -64,16 +64,30 @@ var add = exports.add = function add(v1, v2) {
 };
 
 // scale vector between 0 and 1
-var normalize = exports.normalize = function normalize(v) {
-  var mean = math.mean(v);
-  var sigma = math.std(v);
+var normalize = exports.normalize = function normalize(v, type) {
+  if (type === 'zscore') {
+    var mean = math.mean(v);
+    var sigma = math.std(v);
 
-  // standard scaling
+    // standard scaling
+    return v.map(function (x) {
+      if (sigma === 0) {
+        return 0;
+      }
+      return (x - mean) / sigma;
+    });
+  }
+
+  var min = _fp2.default.min(v);
+  var max = _fp2.default.max(v);
+
+  var range = max - min;
+
   return v.map(function (x) {
-    if (sigma === 0) {
+    if (range === 0) {
       return 0;
     }
-    return (x - mean) / sigma;
+    return (x - min) / range;
   });
 };
 
