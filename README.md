@@ -70,7 +70,7 @@ The function of the constructor is:
 * initialize random weights for neurons
 * bind data and labels, create additional weights for SOMDI if applicable
 
-### Example usage
+### Example usage
 
 ```
 // setup some dummy data (RGB colour values)
