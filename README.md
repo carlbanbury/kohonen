@@ -2,7 +2,12 @@
 A basic implementation of a Kohonen map in JavaScript, forked from here:
 https://github.com/seracio/kohonen
 
-Beyond the basic Kohonen map or self organising map (SOM), the SOM discriminant index [SOMDI](https://www.researchgate.net/publication/223686662_Self_Organising_Maps_for_variable_selection_Application_to_human_saliva_analysed_by_nuclear_magnetic_resonance_spectroscopy_to_investigate_the_effect_of_an_oral_healthcare_product) is implented to provide variable selection and classification.
+Beyond the basic Kohonen map or self organising map (SOM), the SOM discriminant index [SOMDI](https://www.researchgate.net/publication/223686662_Self_Organising_Maps_for_variable_selection_Application_to_human_saliva_analysed_by_nuclear_magnetic_resonance_spectroscopy_to_investigate_the_effect_of_an_oral_healthcare_product) is implemented to provide variable selection and classification.
+
+## Example
+
+Continue below for information on how to use the Kohonen class, or use the web-app GUI which uses this library:
+[Raman Tools](https://github.com/cbanbury/raman-tools)
 
 ## Usage
 
@@ -53,7 +58,7 @@ const k = new Kohonen({data, neurons: hexagonHelper.generateGrid(10,10)});
 
 `data` parameter is an array of the vectors you want to display. There is no need to standardize your data, that will
  be done internally by scaling each feature to the [0,1] range.
- 
+
  `labels` parameter is an array of integer labels to describe the class that each sample in the data belongs to.
 
 The function of the constructor is:
@@ -84,13 +89,6 @@ If a log function is provided as a parameter, it will receive instance neurons a
 const myPositions = k.mapping();
 ```
 
-##### umatrix method
-
-`umatrix` method returns the U-Matrix of the grid (currently only with standardized vectors).
-
-```javascript
-const umatrix = k.umatrix();
-```
 ##### predict method
 `predict` method returns predictions for some test data, using the SOM
 
@@ -114,27 +112,3 @@ k.training();
 // compute SOMDI for given class label
 var somdi = k.SOMDI(0);
 ```
-
-## Example
-
-We've developed a full example on [a dedicated repository](https://github.com/seracio/kohonen-stars)
-
-![capture](https://cdn.rawgit.com/seracio/kohonen-stars/master/images/capture.svg)
-
-## (Re)sources
-
-* [The Self-Organizing Map (SOM)]
-* [d3]
-* [lodash/fp]
-* [ml-pca]
-* [Loadings vs eigenvector in PCA]
-* [SOM tutorial]
-* [Shyam M. Guthikonda]
-
-[d3]: https://d3js.org
-[lodash/fp]: https://github.com/lodash/lodash/wiki/FP-Guide
-[ml-pca]: https://github.com/mljs/pca
-[The Self-Organizing Map (SOM)]: http://www.cis.hut.fi/projects/somtoolbox/theory/somalgorithm.shtml
-[SOM tutorial]: http://www.ai-junkie.com/ann/som/som1.html
-[Loadings vs eigenvector in PCA]: http://stats.stackexchange.com/questions/143905/loadings-vs-eigenvectors-in-pca-when-to-use-one-or-another
-[Shyam M. Guthikonda]: http://www.shy.am/wp-content/uploads/2009/01/kohonen-self-organizing-maps-shyam-guthikonda.pdf
