@@ -3,13 +3,11 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.random = exports.normalize = exports.add = exports.diff = exports.divide = exports.mult = exports.dotProduct = exports.dist = undefined;
+exports.normalize = exports.add = exports.diff = exports.divide = exports.mult = exports.dotProduct = exports.dist = undefined;
 
 var _fp = require('lodash/fp');
 
 var _fp2 = _interopRequireDefault(_fp);
-
-var _d3Random = require('d3-random');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -89,16 +87,4 @@ var normalize = exports.normalize = function normalize(v, type) {
     }
     return (x - min) / range;
   });
-};
-
-// For a given size, return an array of `size` with random values
-// within the gaussian normalization
-//
-// https://github.com/mbostock/d3/wiki/Math
-var random = exports.random = function random(size) {
-  var mean = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.0;
-  var deviation = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1.0;
-  return _fp2.default.map(function (i) {
-    return (0, _d3Random.randomNormal)(mean, deviation)();
-  }, _fp2.default.range(0, size));
 };
