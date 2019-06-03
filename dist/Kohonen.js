@@ -44,6 +44,9 @@ var Kohonen = function () {
   // * minLearningCoef
   // * maxNeighborhood
   // * minNeighborhood
+  // * norm: the normalisation type. options are `zscore` or `max` for min/max normalisation
+  // * class_method: method of classification, valid options = `somdi`, `hits`
+  // * distance: distance measure between neuron options = `manhattan`, defaults to Euclidian
   //
   // each neuron should provide a 2D vector pos,
   // which refer to the grid position
@@ -63,11 +66,10 @@ var Kohonen = function () {
         maxLearningCoef: .4,
         minNeighborhood: .3,
         maxNeighborhood: 1,
-        norm: true, // zscore or max
-        class_method: 'somdi', // alternative is 'hits', 'supervised'
+        norm: true,
+        class_method: 'somdi',
         omega: 1,
-        distance: null, // alternative = 'corr', manhattan
-        _window: 0.3
+        distance: null
       };
 
       properties = _fp2.default.extend(properties, params);
@@ -83,8 +85,6 @@ var Kohonen = function () {
       var norm = properties.norm;
       var class_method = properties.class_method;
       var distance = properties.distance;
-      var _window = properties._window;
-      var omega = properties.omega;
 
       // data vectors should have at least one dimension
       if (!data[0].length) {
@@ -112,13 +112,11 @@ var Kohonen = function () {
       this.maxStep = maxStep;
       this.norm = norm;
       this.distance = distance;
-      this.window = _window;
       this.minLearningCoef = minLearningCoef;
       this.maxLearningCoef = maxLearningCoef;
       this.minNeighborhood = minNeighborhood;
       this.maxNeighborhood = maxNeighborhood;
       this.class_method = class_method;
-      this.omega = omega;
 
       this.commonSetup(data, labels);
 
@@ -129,10 +127,6 @@ var Kohonen = function () {
       this.neurons = neurons.map(function (neuron, index) {
         var item = randomInitialVectors[index];
         item.pos = neuron.pos;
-        item.score = { // use this to rate the performance of each neuron
-          correct: 0,
-          incorrect: 0
-        };
 
         return item;
       });
@@ -191,8 +185,6 @@ var Kohonen = function () {
   }, {
     key: 'seedLabels',
     value: function seedLabels(data, labels) {
-      var _this2 = this;
-
       var numClasses = _fp2.default.max(labels) + 1;
       var out = { v: [], labels: [], somdi: [] };
       data.map(function (item, index) {
@@ -202,10 +194,6 @@ var Kohonen = function () {
           var currentLabel = labels[index];
           var somdi = new Array(numClasses).fill(0);
           somdi[currentLabel] = 1;
-
-          if (_this2.class_method === 'supervised') {
-            somdi[currentLabel] = 1 * _this2.omega;
-          }
         }
 
         out.v.push(item);
@@ -215,32 +203,13 @@ var Kohonen = function () {
 
       return out;
     }
-
-    // seed a neuron at a set index using the average of the associated class label
-
-  }, {
-    key: 'averageSeed',
-    value: function averageSeed(index, dataLabel) {
-      var vectors = [];
-      var self = this;
-      this._data.labels.filter(function (label, index) {
-        if (label === dataLabel) {
-          vectors.push(self._data.v[index]);
-        }
-      });
-
-      if (vectors.length > 0) {
-        var meanVector = math.mean(vectors, 0);
-        this.neurons[index].weight = meanVector;
-      }
-    }
   }, {
     key: 'normalize',
     value: function normalize(data) {
-      var _this3 = this;
+      var _this2 = this;
 
       data.forEach(function (item, index) {
-        data[index] = (0, _vector.normalize)(item, _this3.norm);
+        data[index] = (0, _vector.normalize)(item, _this2.norm);
       });
       return data;
     }
@@ -263,7 +232,7 @@ var Kohonen = function () {
   }, {
     key: 'learnStep',
     value: function learnStep() {
-      var _this4 = this;
+      var _this3 = this;
 
       // pick index for random sample
       var sampleIndex = this.pickDataIndex();
@@ -271,25 +240,21 @@ var Kohonen = function () {
       var sampleSOMDI = this._data.somdi[sampleIndex];
 
       // find bmu
-      if (this.class_method === 'supervised') {
-        var bmu = this.findBestMatchingUnit(sample.concat(sampleSOMDI));
-      } else {
-        var bmu = this.findBestMatchingUnit(sample);
-      }
+      var bmu = this.findBestMatchingUnit(sample);
 
       // compute current learning coef
       var currentLearningCoef = this.scaleStepLearningCoef(this.step);
 
       this.neurons.forEach(function (neuron) {
         // compute neighborhood
-        var currentNeighborhood = _this4.neighborhood(bmu, neuron);
+        var currentNeighborhood = _this3.neighborhood(bmu, neuron);
         var scaleFactor = currentNeighborhood * currentLearningCoef;
 
         // update weights for neuron
-        neuron.weight = _this4.updateStep(neuron.weight, sample, scaleFactor);
+        neuron.weight = _this3.updateStep(neuron.weight, sample, scaleFactor);
 
         // also update weights of SOMDI
-        neuron.somdi = _this4.updateStep(neuron.somdi, sampleSOMDI, scaleFactor);
+        neuron.somdi = _this3.updateStep(neuron.somdi, sampleSOMDI, scaleFactor);
       });
 
       this.step += 1;
@@ -440,13 +405,13 @@ var Kohonen = function () {
   }, {
     key: 'mapping',
     value: function mapping() {
-      var _this5 = this;
+      var _this4 = this;
 
       var positions = [];
 
       // reset hit counts for all neurons
       this.neurons.forEach(function (neuron, index) {
-        _this5.neurons[index].hits = Array(_this5.somdiLength).fill(0);
+        _this4.neurons[index].hits = Array(_this4.somdiLength).fill(0);
       });
 
       for (var i = 0; i < this._data.v.length; i++) {
@@ -469,22 +434,6 @@ var Kohonen = function () {
       return positions;
     }
 
-    // measure of how similar the data is to the model
-
-  }, {
-    key: 'qFactor',
-    value: function qFactor() {
-      var Q = [];
-      for (var i = 0; i < this._data.v.length; i++) {
-        var sample = this._data.v[i];
-        var bmu = this.findBestMatchingUnit(sample);
-        Q.push((0, _vector.dist)(sample, bmu.weight));
-      }
-
-      // return the average q factor
-      return math.mean(Q);
-    }
-
     // get the neuron and it's index for a given [x, y] position
 
   }, {
@@ -500,30 +449,13 @@ var Kohonen = function () {
 
       return { neuron: this.neurons[i], index: i };
     }
-  }, {
-    key: 'setNeuronScore',
-    value: function setNeuronScore(pos, correct) {
-      var i = this.neurons.findIndex(function (neuron) {
-        return neuron.pos === pos;
-      });
-
-      if (i < 0) {
-        return null;
-      }
-
-      if (correct) {
-        this.neurons[i].score.correct += 1;
-      } else {
-        this.neurons[i].score.incorrect += 1;
-      }
-    }
 
     // generate somdi index for classIndex defined as input.
     // type used to identify neurons that work well for classification
 
   }, {
     key: 'SOMDI',
-    value: function SOMDI(classIndex, type, threshold) {
+    value: function SOMDI(classIndex, threshold) {
       var _threshold = 0;
       if (threshold) {
         _threshold = threshold;
@@ -534,16 +466,6 @@ var Kohonen = function () {
       var classNeurons = this.neurons.filter(function (neuron) {
         var maxIndex = self.maxIndex(neuron.somdi);
         neuron.sWeight = neuron.somdi[maxIndex];
-
-        if (type) {
-          if (type === 'positive') {
-            return neuron.score.correct > 0 && neuron.score.incorrect === 0;
-          }
-
-          if (type === 'negative') {
-            return neuron.score.incorrect > 0 && neuron.score.correct === 0;
-          }
-        }
 
         return maxIndex === classIndex && neuron.sWeight > _threshold;
       });
@@ -565,8 +487,7 @@ var Kohonen = function () {
       return { somdi: somdi, positions: positions };
     }
 
-    // get the classes for each neuron. Currently based on somdi
-    // TODO: add support for hit count and neuron performance
+    // get the classes for each neuron
 
   }, {
     key: 'neuronClasses',
@@ -594,53 +515,6 @@ var Kohonen = function () {
       });
 
       return out;
-    }
-
-    // expects an array of test samples and array of labels with corresponding indexes
-    // e.g. testData = [[1, 0, 0], [0, 0, 1], [0, 1, 0]]; testLabels = [1, 0, 2]
-    // if hits is true, use hit count for classification, else use SOMDI
-
-  }, {
-    key: 'predict',
-    value: function predict(testData, testLabels, predictIndex, falseIndex) {
-      var self = this;
-
-      // normalise the test data if norm enabled
-      if (this.norm) {
-        testData = self.normalize(testData);
-      }
-
-      var results = [];
-      testData.forEach(function (item, index) {
-        var bmu = self.findBestMatchingUnit(item);
-
-        // Hit count based classification
-        var winningIndex = -1;
-        var match = self.getNeuron(bmu.pos);
-        if (match) {
-          if (self.class_method === 'hits') {
-            var hits = match.neuron.hits;
-            winningIndex = self.maxIndex(hits);
-          } else {
-            // SOMDI based calculation of winning neuron
-            var winningIndex = self.maxIndex(match.neuron.somdi);
-          }
-        }
-
-        // if sample is of type we want to track performance of
-        if (testLabels[index] === predictIndex) {
-          if (winningIndex === predictIndex) {
-            self.setNeuronScore(bmu.pos, true);
-          } else if (winningIndex === falseIndex) {
-            // record neurons that classify incorrectly
-            self.setNeuronScore(bmu.pos, false);
-          }
-        }
-
-        results.push(winningIndex);
-      });
-
-      return results;
     }
   }, {
     key: '_predict',
@@ -747,12 +621,6 @@ var Kohonen = function () {
         }, 'asc'), _fp2.default.nth(index))(this.neurons);
       }
 
-      if (this.distance === 'corr') {
-        return _fp2.default.flow(_fp2.default.orderBy(function (n) {
-          return (0, _vector.dotProduct)(target, getWeight(n));
-        }, 'desc'), _fp2.default.nth(index))(this.neurons);
-      }
-
       return _fp2.default.flow(_fp2.default.orderBy(function (n) {
         return (0, _vector.dist)(target, getWeight(n));
       }, 'asc'), _fp2.default.nth(index))(this.neurons);
@@ -773,95 +641,6 @@ var Kohonen = function () {
 
       return a * Math.exp(-(Math.pow(neuron.pos[0] - bmu.pos[0], 2) / 2 * Math.pow(sigmaX, 2) + Math.pow(neuron.pos[1] - bmu.pos[1], 2) / 2 * Math.pow(sigmaY, 2))) * this.scaleStepNeighborhood(this.step);
     }
-
-    // The U-Matrix value of a particular node
-    // is the average distance between the node's weight vector and that of its closest neighbors.
-    // TODO: reimplement this
-    // umatrix() {
-    //   const roundToTwo = num => +(Math.round(num + "e+2") + "e-2");
-    //   const findNeighors = cn => _.filter(
-    //     n => roundToTwo(dist(n.pos, cn.pos)) === 1,
-    //     this.neurons
-    //   );
-    //   return _.map(
-    //     n => mean(findNeighors(n).map(nb => dist(nb.v, n.v))),
-    //     this.neurons
-    //   );
-    // }
-
-
-    // TODO: reimplement this
-    // hitMap() {
-    //   var that = this;
-    //   var classMap = [];
-    //   var positions = [];
-    //   this.hitCount = [];
-    //   var that = this;
-
-    //   // loop through all data and match classes to positions
-    //   this.data.forEach(function(item) {
-    //     var classLabels = item.slice(-that.classPlanes.length);
-    //     var bmu = that.findBestMatchingUnit(item);
-
-    //     // store best matching unit and class index
-    //     classMap.push([bmu.pos, classLabels]);
-    //     positions.push(bmu.pos);
-    //   });
-
-    //   // loop through all positions
-    //   positions.forEach(function(position) {
-    //     // filter and sum class indexes to get hit count
-    //     var matches = classMap.filter(function(result) {
-    //       return result[0] === position;
-    //     });
-
-    //     var hits = new Array(that.classPlanes.length).fill(0);
-    //     matches.forEach(function(match) {
-    //       hits = add(hits, match[1]);
-    //     });
-
-    //     var winner = -1;
-    //     var maxCount = _.max(hits);
-    //     var guess = hits.indexOf(maxCount);
-    //     var check = hits.lastIndexOf(maxCount);
-
-    //     if (guess === check) {
-    //       winner = guess;
-    //     }
-
-    //     var meta = {hits: hits, winner: winner};
-    //     that.hitCount.push([position, meta]);
-    //   });
-    // }
-
-    // TODO: reimplement this
-    // classifyHits(test) {
-    //   if (this.norm) {
-    //       // make sure we only normalize the data and not the class planes!!!
-    //       var classData = test.slice(-this.classPlanes.length);
-    //       var testData = test.slice(0,test.length-this.classPlanes.length);
-
-    //       testData = n.normalize(testData, 'max');
-    //       test = testData.concat(classData);
-    //   }
-
-
-    //   if (!this.hitCount) {
-    //     return null;
-    //   }
-
-    //   var bmu = this.findBestMatchingUnit(test);
-    //   var match = this.hitCount.filter(function(item) {
-    //     return item[0] === bmu.pos;
-    //   });
-
-    //   if (match) {
-    //     return match[0];
-    //   }
-
-    //   return null;
-    // }
-
   }]);
 
   return Kohonen;
