@@ -2,12 +2,15 @@
 A basic implementation of a Kohonen map in JavaScript, forked from here:
 https://github.com/seracio/kohonen
 
-Beyond the basic Kohonen map or self organising map (SOM), the SOM discriminant index [SOMDI](https://www.researchgate.net/publication/223686662_Self_Organising_Maps_for_variable_selection_Application_to_human_saliva_analysed_by_nuclear_magnetic_resonance_spectroscopy_to_investigate_the_effect_of_an_oral_healthcare_product) is implemented to provide variable selection and classification.
+Beyond the basic Kohonen map or self organising map (SOM), the SOM discriminant index [SOMDI](https://www.researchgate.net/publication/223686662_Self_Organising_Maps_for_variable_selection_Application_to_human_saliva_analysed_by_nuclear_magnetic_resonance_spectroscopy_to_investigate_the_effect_of_an_oral_healthcare_product) is implemented to provide variable selection.
+
+This has further been extended to provide classification based on SOMDI to identify the winning class for each neuron, and learning vector quantization (LVQ) as a method of supervised learning that can be layered in.
 
 ## Example
 
-Continue below for information on how to use the Kohonen class, or use the web-app GUI which uses this library:
-[Raman Tools](https://github.com/cbanbury/raman-tools)
+Continue below for information on how to use the Kohonen class, or see the [Raman Tools](https://github.com/cbanbury/raman-tools) reposistory for a web app GUI using these functions. An example of the application can be found at:
+
+http://raman.banbury.ch
 
 ## Usage
 
@@ -31,8 +34,8 @@ The Kohonen class is the main class.
 
 ##### Constructor
 
-|  param name      | definition       | type             | mandatory        | default          |
-|:----------------:|:----------------:|:----------------:|:----------------:|:----------------:|
+|  param name      | definition       | type             | mandatory        | default          | options |
+|:----------------:|:----------------:|:----------------:|:----------------:|:----------------:|:--------|
 |    neurons       |  grid of neurons |   Array          |       yes        |                  |
 |    data          |  dataset         |   Array of Array |       yes        |                  |
 |    labels        |  datset          |   Array          |       no         |                  |
@@ -41,9 +44,9 @@ The Kohonen class is the main class.
 | minLearningCoef  |                  |   Number         |       no         |      .3          |
 | maxNeighborhood  |                  |   Number         |       no         |      1           |
 | minNeighborhood  |                  |   Number         |       no         |      .3          |
-|    norm          |  flag            |   Boolean        |       no         |     true         |
-|    distance      |  distance metric |   String         |       no         |     Euclidian    |
-|   classifier     |  method          |   String         |       no         |     somdi        |
+|    norm          |normalisation type|   String         |       no         |                  | 'zcore', 'max'
+|    distance      |  distance metric |   String         |       no         |     Euclidian    | 'manhattan'
+|   class_method   | classificatin method |   String         |       no     |     somdi        | 'hits'
 
 ```javascript
 
