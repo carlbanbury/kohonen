@@ -1,5 +1,4 @@
 import _ from 'lodash/fp';
-import { randomNormal } from 'd3-random';
 const math = require('mathjs');
 
 // euclidian distance of 2 vectors
@@ -59,10 +58,3 @@ export const normalize = function(v, type) {
     return (x - min) / range;
   });
 };
-
-// For a given size, return an array of `size` with random values
-// within the gaussian normalization
-//
-// https://github.com/mbostock/d3/wiki/Math
-export const random = (size, mean = 0.0, deviation = 1.0) =>
-  _.map(i => randomNormal(mean, deviation)(), _.range(0, size));

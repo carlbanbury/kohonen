@@ -1,15 +1,10 @@
 import { scaleLinear } from 'd3-scale';
-import { extent, mean, deviation } from 'd3-array';
 import _ from 'lodash/fp';
-import { dist, mult, diff, add, normalize, dotProduct, divide } from './vector';
+import { dist, mult, diff, add, normalize, divide } from './vector';
 const mld = require('ml-distance');
-const math = require('mathjs')
 
 // lodash/fp random has a fixed arity of 2, without the last (and useful) param
 const random = _.random.convert({ fixed: false });
-
-// lodash/fp map has an iteratee with a single arg
-const mapWithIndex = _.map.convert({ cap: false });
 
 // A basic implementation of Kohonen map
 
@@ -166,7 +161,7 @@ class Kohonen {
 
       if (labels) {
         var currentLabel = labels[index];
-        var somdi = new Array(numClasses).fill(0);
+        somdi = new Array(numClasses).fill(0);
         somdi[currentLabel] = 1;
       }
 
@@ -308,7 +303,7 @@ class Kohonen {
 
           // also update SOMDI weights
           if (self.class_method === 'somdi') {
-            var sampleSMDI = self._data.somdi[sampleIndex];
+            var sampleSOMDI = self._data.somdi[sampleIndex];
             self.neurons[a.index].somdi = self.lvqUpdate(self.neurons[a.index].somdi, sampleSOMDI, 0, 0);
             self.neurons[b.index].somdi = self.lvqUpdate(self.neurons[b.index].somdi, sampleSOMDI, 0, 1);
           }
@@ -320,7 +315,7 @@ class Kohonen {
 
           // also update SOMDI weights
           if (self.class_method === 'somdi') {
-            var sampleSMDI = self._data.somdi[sampleIndex];
+            var sampleSOMDI = self._data.somdi[sampleIndex];
             self.neurons[b.index].somdi = self.lvqUpdate(self.neurons[b.index].somdi, sampleSOMDI, 0, 0);
             self.neurons[a.index].somdi = self.lvqUpdate(self.neurons[a.index].somdi, sampleSOMDI, 0, 1);
 
@@ -424,7 +419,7 @@ class Kohonen {
     });
 
     // multiply weight by somdiWeight & sum over all neurons
-    var somdi = new Array(this.neurons[0].weight.length).fill(0);;
+    var somdi = new Array(this.neurons[0].weight.length).fill(0);
     classNeurons.forEach(function(neuron) {
       var current = mult(neuron.weight, neuron.sWeight);
       somdi = add(somdi, current);
@@ -472,7 +467,7 @@ class Kohonen {
     }
 
     var results = [];
-    testData.forEach(function(item, index) {
+    testData.forEach(function(item) {
      var bmu = self.findBestMatchingUnit(item);
 
       // Hit count based classification
@@ -484,7 +479,7 @@ class Kohonen {
           winningIndex = self.maxIndex(hits);
         } else {
           // SOMDI based calculation of winning neuron
-          var winningIndex = self.maxIndex(match.neuron.somdi);
+          winningIndex = self.maxIndex(match.neuron.somdi);
         }
       }
 
@@ -504,7 +499,7 @@ class Kohonen {
 
   // pick a random vector among data
   pickDataIndex() {
-    return _.random(0, this._data.v.length - 1);
+    return random(0, this._data.v.length - 1);
   }
 
   generateInitialVectors(labels) {
@@ -516,7 +511,7 @@ class Kohonen {
       var hits = null;
 
       if (labels) {
-        var somdi = Array(this.somdiLength).fill(0).map(()=>Math.random());
+        somdi = Array(this.somdiLength).fill(0).map(()=>Math.random());
         hits = Array(this.somdiLength).fill(0);
       }
 
