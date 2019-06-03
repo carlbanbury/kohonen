@@ -2,12 +2,15 @@
 A basic implementation of a Kohonen map in JavaScript, forked from here:
 https://github.com/seracio/kohonen
 
-Beyond the basic Kohonen map or self organising map (SOM), the SOM discriminant index [SOMDI](https://www.researchgate.net/publication/223686662_Self_Organising_Maps_for_variable_selection_Application_to_human_saliva_analysed_by_nuclear_magnetic_resonance_spectroscopy_to_investigate_the_effect_of_an_oral_healthcare_product) is implemented to provide variable selection and classification.
+Beyond the basic Kohonen map or self organising map (SOM), the SOM discriminant index [SOMDI](https://www.researchgate.net/publication/223686662_Self_Organising_Maps_for_variable_selection_Application_to_human_saliva_analysed_by_nuclear_magnetic_resonance_spectroscopy_to_investigate_the_effect_of_an_oral_healthcare_product) is implemented to provide variable selection.
+
+This has further been extended to provide classification based on SOMDI to identify the winning class for each neuron, and learning vector quantization (LVQ) as a method of supervised learning that can be layered in.
 
 ## Example
 
-Continue below for information on how to use the Kohonen class, or use the web-app GUI which uses this library:
-[Raman Tools](https://github.com/cbanbury/raman-tools)
+Continue below for information on how to use the Kohonen class, or see the [Raman Tools](https://github.com/cbanbury/raman-tools) reposistory for a web app GUI using these functions. An example of the application can be found at:
+
+http://raman.banbury.ch
 
 ## Usage
 
@@ -31,8 +34,8 @@ The Kohonen class is the main class.
 
 ##### Constructor
 
-|  param name      | definition       | type             | mandatory        | default          |
-|:----------------:|:----------------:|:----------------:|:----------------:|:----------------:|
+|  param name      | definition       | type             | mandatory        | default          | options |
+|:----------------:|:----------------:|:----------------:|:----------------:|:----------------:|:--------|
 |    neurons       |  grid of neurons |   Array          |       yes        |                  |
 |    data          |  dataset         |   Array of Array |       yes        |                  |
 |    labels        |  datset          |   Array          |       no         |                  |
@@ -41,9 +44,9 @@ The Kohonen class is the main class.
 | minLearningCoef  |                  |   Number         |       no         |      .3          |
 | maxNeighborhood  |                  |   Number         |       no         |      1           |
 | minNeighborhood  |                  |   Number         |       no         |      .3          |
-|    norm          |  flag            |   Boolean        |       no         |     true         |
-|    distance      |  distance metric |   String         |       no         |     Euclidian    |
-|   classifier     |  method          |   String         |       no         |     somdi        |
+|    norm          |normalisation type|   String         |       no         |                  | 'zcore', 'max'
+|    distance      |  distance metric |   String         |       no         |     Euclidian    | 'manhattan'
+|   class_method   | classificatin method |   String         |       no     |     somdi        | 'hits'
 
 ```javascript
 
@@ -67,48 +70,51 @@ The function of the constructor is:
 * initialize random weights for neurons
 * bind data and labels, create additional weights for SOMDI if applicable
 
-##### training method
+### Example usage
 
-|  param name      | definition                                       | type             | mandatory        | default          |
-|:----------------:|:------------------------------------------------:|:----------------:|:----------------:|:----------------:|
-|    log           |  func called after each step of learning process |   Function       |       no         |  ()=>{}          |
-
-
-```javascript
-k.training();
 ```
+// setup some dummy data (RGB colour values)
+var data = [
+  [1, 0, 0], 
+  [0.8, 0.1, 0], 
+  [0.2, 1, 0.2],
+  [0, 0.3, 1]
+];
 
-`training` method iterates on random vectors picked on normalized data.
-If a log function is provided as a parameter, it will receive instance neurons and step as params.
+// 0 = red, 1 = green, 2 = blue
+var labels = [0, 0, 1, 2];
 
-##### mapping method
+var neurons = hexagonHelper.generateGrid(4, 4);
+const k = new Kohonen({
+  data: data,
+  labels: labels,
+  neurons,
+  maxStep: 1000,
+  maxLearningCoef: 0.1,
+  minLearningCoef: 0.001,
+  maxNeighborhood: 3,
+  minNeighborhood: 0.1
+});
 
-`mapping` method returns grid position for each data provided on the constructor.
+// train SOM
+k.learn((neurons, step)=>{
+  console.log(step);
+});
 
-```javascript
-const myPositions = k.mapping();
-```
+// apply LVQ
+k.LVQ();
 
-##### predict method
-`predict` method returns predictions for some test data, using the SOM
-
-```javascript
-// train the model
-k.training();
+// Grab results
+SOM = k.mapping();
+SOMDI_RED = k.SOMDI(0);
+SOMDI_GREEN = k.SOMDI(1);
+SOMDI_BLUE = k.SOMDI(2);
 
 // make some predictions
-var testData = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [0.9, 0, 0];
-var testLabels = [0, 1, 2, 0];
+var testData = [
+    [0.9, 0.2, 0.3],
+    [0, 0, 1]
+];
 
-var predictions = k.predict(testData, testlabels);
-```
-##### SOMDI method
-`SOMDI` method returns the SOMDI for a given class label
-
-```javascript
-// train the model
-k.training();
-
-// compute SOMDI for given class label
-var somdi = k.SOMDI(0);
+predictions = k._predict(testData);
 ```
