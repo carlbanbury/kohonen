@@ -70,48 +70,51 @@ The function of the constructor is:
 * initialize random weights for neurons
 * bind data and labels, create additional weights for SOMDI if applicable
 
-##### training method
+### Example usage
 
-|  param name      | definition                                       | type             | mandatory        | default          |
-|:----------------:|:------------------------------------------------:|:----------------:|:----------------:|:----------------:|
-|    log           |  func called after each step of learning process |   Function       |       no         |  ()=>{}          |
-
-
-```javascript
-k.training();
 ```
+// setup some dummy data (RGB colour values)
+var data = [
+  [1, 0, 0], 
+  [0.8, 0.1, 0], 
+  [0.2, 1, 0.2],
+  [0, 0.3, 1]
+];
 
-`training` method iterates on random vectors picked on normalized data.
-If a log function is provided as a parameter, it will receive instance neurons and step as params.
+// 0 = red, 1 = green, 2 = blue
+var labels = [0, 0, 1, 2];
 
-##### mapping method
+var neurons = hexagonHelper.generateGrid(4, 4);
+const k = new Kohonen({
+  data: data,
+  labels: labels,
+  neurons,
+  maxStep: 1000,
+  maxLearningCoef: 0.1,
+  minLearningCoef: 0.001,
+  maxNeighborhood: 3,
+  minNeighborhood: 0.1
+});
 
-`mapping` method returns grid position for each data provided on the constructor.
+// train SOM
+k.learn((neurons, step)=>{
+  console.log(step);
+});
 
-```javascript
-const myPositions = k.mapping();
-```
+// apply LVQ
+k.LVQ();
 
-##### predict method
-`predict` method returns predictions for some test data, using the SOM
-
-```javascript
-// train the model
-k.training();
+// Grab results
+SOM = k.mapping();
+SOMDI_RED = k.SOMDI(0);
+SOMDI_GREEN = k.SOMDI(1);
+SOMDI_BLUE = k.SOMDI(2);
 
 // make some predictions
-var testData = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [0.9, 0, 0];
-var testLabels = [0, 1, 2, 0];
+var testData = [
+    [0.9, 0.2, 0.3],
+    [0, 0, 1]
+];
 
-var predictions = k.predict(testData, testlabels);
-```
-##### SOMDI method
-`SOMDI` method returns the SOMDI for a given class label
-
-```javascript
-// train the model
-k.training();
-
-// compute SOMDI for given class label
-var somdi = k.SOMDI(0);
+predictions = k._predict(testData);
 ```
