@@ -198,6 +198,22 @@ var Kohonen = function () {
       return out;
     }
   }, {
+    key: 'averageSeed',
+    value: function averageSeed(index, dataLabel) {
+      var vectors = [];
+      var self = this;
+      this._data.labels.filter(function (label, index) {
+        if (label === dataLabel) {
+          vectors.push(self._data.v[index]);
+        }
+      });
+
+      if (vectors.length > 0) {
+        var meanVector = math.mean(vectors, 0);
+        this.neurons[index].weight = meanVector;
+      }
+    }
+  }, {
     key: 'normalize',
     value: function normalize(data) {
       var _this2 = this;
