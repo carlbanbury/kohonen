@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.normalize = exports.add = exports.diff = exports.divide = exports.mult = exports.dotProduct = exports.dist = undefined;
+exports.normalize = exports.add = exports.diff = exports.divide = exports.mult = exports.dist = undefined;
 
 var _fp = require('lodash/fp');
 
@@ -22,15 +22,6 @@ var dist = exports.dist = function dist(v1, v2) {
     throw new Error('vector.dist : not a number');
   }
   return d;
-};
-
-var dotProduct = exports.dotProduct = function dotProduct(v1, v2) {
-  var sum = 0;
-  v1.map(function (item, index) {
-    sum += item * v2[index];
-  });
-
-  return sum;
 };
 
 // scalar mult of a vector

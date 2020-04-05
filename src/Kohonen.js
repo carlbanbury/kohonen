@@ -557,6 +557,16 @@ class Kohonen {
       return neuron.weight;
     }
 
+    if (this.distance = 'cosine') {
+      return _.flow(
+        _.orderBy(
+          n => mld.distance.cosine(target, getWeight(n)),
+          'desc',
+        ),
+        _.nth(index)
+      )(this.neurons);
+    }
+
     if (this.distance === 'manhattan') {
       return _.flow(
         _.orderBy(
@@ -569,7 +579,7 @@ class Kohonen {
 
     return _.flow(
       _.orderBy(
-        n => dist(target, getWeight(n)),
+        n => mld.distance.euclidean(target, getWeight(n)),
         'asc',
       ),
       _.nth(index)

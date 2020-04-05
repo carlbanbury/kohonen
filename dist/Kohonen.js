@@ -625,6 +625,12 @@ var Kohonen = function () {
         return neuron.weight;
       };
 
+      if (this.distance = 'cosine') {
+        return _fp2.default.flow(_fp2.default.orderBy(function (n) {
+          return mld.distance.cosine(target, getWeight(n));
+        }, 'desc'), _fp2.default.nth(index))(this.neurons);
+      }
+
       if (this.distance === 'manhattan') {
         return _fp2.default.flow(_fp2.default.orderBy(function (n) {
           return mld.distance.manhattan(target, getWeight(n));
@@ -632,7 +638,7 @@ var Kohonen = function () {
       }
 
       return _fp2.default.flow(_fp2.default.orderBy(function (n) {
-        return (0, _vector.dist)(target, getWeight(n));
+        return mld.distance.euclidean(target, getWeight(n));
       }, 'asc'), _fp2.default.nth(index))(this.neurons);
     }
 

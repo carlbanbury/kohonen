@@ -10,15 +10,6 @@ export const dist = (v1, v2) => {
   return d;
 };
 
-export const dotProduct = function(v1, v2) {
-  var sum = 0;
-  v1.map(function(item, index) {
-    sum += item * v2[index];
-  });
-
-  return sum;
-}
-
 // scalar mult of a vector
 export const mult = (v, coef) => v.map(val => val * coef);
 
