@@ -560,7 +560,7 @@ class Kohonen {
     if (this.distance = 'cosine') {
       return _.flow(
         _.orderBy(
-          n => mld.distance.cosine(target, getWeight(n)),
+          n => mld.similarity.cosine(target, getWeight(n)),
           'desc',
         ),
         _.nth(index)

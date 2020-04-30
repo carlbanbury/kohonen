@@ -627,7 +627,7 @@ var Kohonen = function () {
 
       if (this.distance = 'cosine') {
         return _fp2.default.flow(_fp2.default.orderBy(function (n) {
-          return mld.distance.cosine(target, getWeight(n));
+          return mld.similarity.cosine(target, getWeight(n));
         }, 'desc'), _fp2.default.nth(index))(this.neurons);
       }
 
